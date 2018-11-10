@@ -11,8 +11,8 @@
                 // alert("WebSocket is supported by your Browser!");
 
                 // Let us open a web socket
-                // var ws = new WebSocket("ws://172.20.10.4:8000");
-                ws = new WebSocket("ws://127.0.0.1:8000/ws");
+                ws = new WebSocket("ws://172.20.10.4:8000/ws");
+                // ws = new WebSocket("ws://127.0.0.1:8000/ws");
 
                 ws.onopen = function() {
                     console.log("Connection is connected...");
@@ -41,6 +41,15 @@
                 message: JSON.stringify(action) // Strip out html
             }));
         }
+
+        function sentLogin(val){
+            var action = {"data":val}; // right left jump
+            ws.send(JSON.stringify({
+                type: "login",
+                channel: "1",
+                message: JSON.stringify(action) // Strip out html
+            }));
+        }
     </script>
 
 </head>
@@ -49,6 +58,7 @@
 <div id = "sse">
     Controller <br/>
     <button type="button" onClick="javascript:WebSocketTest();">connect</button>
+    <button type="button" onClick="javascript:sentLogin('Harland');">login</button>
 
     <button type="button" onClick="javascript:sentAction('right');">right</button>
     <button type="button" onClick="javascript:sentAction('left');">left</button>

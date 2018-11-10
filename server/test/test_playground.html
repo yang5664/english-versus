@@ -11,8 +11,8 @@
                 // alert("WebSocket is supported by your Browser!");
 
                 // Let us open a web socket
-                // var ws = new WebSocket("ws://172.20.10.4:8000");
-                ws = new WebSocket("ws://127.0.0.1:8000/ws");
+                ws = new WebSocket("ws://172.20.10.4:8000/ws");
+                // ws = new WebSocket("ws://127.0.0.1:8000/ws");
 
                 ws.onopen = function() {
                     console.log("Connection is connected...");
@@ -38,6 +38,14 @@
                 var log = document.getElementById("log");
                 log.innerHTML += val + " <br/>";
             }
+
+            function setPlayground() {
+                ws.send(JSON.stringify({
+                    type: "playground",
+                    channel: "1",
+                    message: ""
+                }));
+            }
         }
     </script>
 
@@ -47,6 +55,7 @@
 <div id = "sse">
     Playground <br/>
     <button type="button" onClick="javascript:WebSocketTest();">connect</button>
+    <button type="button" onClick="javascript:setPlayground();">setPlayground</button>
     <button type="button" onClick="javascript:ws.close();">disconnect</button>
 
 </div>
