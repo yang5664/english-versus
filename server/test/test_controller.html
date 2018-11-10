@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+<title>Controller</title>
+    <script type = "text/javascript">
+    var ws;
+        function WebSocketTest() {
+
+            if ("WebSocket" in window) {
+                // alert("WebSocket is supported by your Browser!");
+
+                // Let us open a web socket
+                // var ws = new WebSocket("ws://172.20.10.4:8000");
+                ws = new WebSocket("ws://127.0.0.1:8000/ws");
+
+                ws.onopen = function() {
+                    console.log("Connection is connected...");
+                    // Web Socket is connected, send data using send()
+                };
+
+                ws.onmessage = function (evt) {
+                    var received_msg = evt.data;
+
+                };
+
+                ws.onclose = function() {
+                    // websocket is closed.
+                    console.log("Connection is closed...");
+                };
+            } else {
+
+                // The browser doesn't support WebSocket
+                alert("WebSocket NOT supported by your Browser!");
+            }
+        }
+
+        function sentAction(val){
+            var action = {"data":val}; // right left jump
+            ws.send(JSON.stringify({
+                type: "action",
+                channel: "1",
+                message: JSON.stringify(action) // Strip out html
+            }));
+        }
+    </script>
+
+</head>
+
+<body>
+<div id = "sse">
+    Controller <br/>
+    <button type="button" onClick="javascript:WebSocketTest();">connect</button>
+
+    <button type="button" onClick="javascript:sentAction('right');">right</button>
+    <button type="button" onClick="javascript:sentAction('left');">left</button>
+    <button type="button" onClick="javascript:sentAction('jump');">jump</button>
+
+    <button type="button" onClick="javascript:ws.close();">disconnect</button>
+
+</div>
+
+</body>
+</html>
