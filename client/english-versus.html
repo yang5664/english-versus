@@ -105,10 +105,12 @@ let Application = PIXI.Application,
     Text = PIXI.Text,
     TextStyle = PIXI.TextStyle;
 
+let wW = 1600;
+let hH = 900;
 //Create a Pixi Application
 let app = new Application({
-    width: 1600,
-    height: 900,
+    width: wW,
+    height: hH,
     antialiasing: true,
     transparent: false,
     resolution: 1
@@ -399,12 +401,31 @@ function start() {
 function play(delta) {
     // A 玩家移動
     playerA.x += playerA.vx;
+    if(playerA.x + playerA.width >= wW){
+        playerA.x = wW - playerA.width;
+    }
+    if(playerA.x < 0){
+        playerA.x = 0;
+    }
+    if(playerA.y <= 0){
+        playerA.y = 0;
+    }
+
     g = playerA.y >= footer ? 0 : 0.3;
     playerA_vy += g;
     playerA.y += playerA_vy;
     if(playerA.y >= footer) playerA.y = footer;
     // B
     playerB.x += playerB.vx;
+    if(playerB.x + playerB.width >= wW){
+        playerB.x = wW - playerB.width;
+    }
+    if(playerB.x < 0){
+        playerB.x = 0;
+    }
+    if(playerB.y <= 0){
+        playerB.y = 0;
+    }
     g = playerB.y >= footer ? 0 : 0.3;
     playerB_vy += g;
     playerB.y += playerB_vy;
