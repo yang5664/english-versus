@@ -69,7 +69,7 @@
 
         var fontStyle = new PIXI.TextStyle({
                 fontFamily: 'Arial',
-                fontSize: 80,
+                fontSize: 60,
                 fontStyle: 'italic',
                 fontWeight: 'bold',
                 fill: ['#ffffff', '#00ff99'], // gradient
@@ -142,11 +142,11 @@
             gameScene.visible = true;
             // 計時板
             timerBoard = new PIXI.Text(60, fontStyle);
-            timerBoard.x = app.stage.width / 2 - 20;
-            timerBoard.y = 100;
+            timerBoard.x = 20;
+            timerBoard.y = 0;
             gameScene.addChild(timerBoard);
             // 目前字母
-            currentWordBoard = new PIXI.Text('APPLE', fontStyle);
+            currentWordBoard = new Container();
             currentWordBoard.x = app.stage.width / 2 - 100;
             currentWordBoard.y = 20;
             gameScene.addChild(currentWordBoard);
@@ -177,7 +177,7 @@
             
             gameScene.addChild(playerA);
             // 字母蒐集板
-            playerA.board = new PIXI.Text('', fontStyle);
+            playerA.board = new Container();
             playerA.board.x = 200;
             playerA.board.y = 100;
             gameScene.addChild(playerA.board);
@@ -207,7 +207,7 @@
 
             gameScene.addChild(playerB);
 
-            playerB.board = new PIXI.Text('', fontStyle);
+            playerB.board = new Container();
             playerB.board.x = app.stage.width - 350;
             playerB.board.y = 100;
             gameScene.addChild(playerB.board);
@@ -440,7 +440,13 @@
                 });
             }
 
-            player.board.setText(player.collect.join(""));
+            player.board.removeChildren(0, 3);
+            player.collect.forEach(function(letter, idx) {
+                let _letter = new Sprite(id[`font/${letter}.png`]);
+                _letter.x = idx * 50;
+                _letter.y = 0;
+                player.board.addChild(_letter);
+            });
         }
 
         // 產生字母
@@ -460,7 +466,13 @@
                 randLetters.push(letters[idx]);
             }
             */
-            currentWordBoard.setText(correctLetter.join(""));
+            currentWordBoard.removeChildren(0, 3);
+            correctLetter.forEach(function(letter, idx) {
+                let _letter = new Sprite(id[`font/${letter}.png`]);
+                _letter.x = idx * 50;
+                _letter.y = 0;
+                currentWordBoard.addChild(_letter);
+            });
             randLetters = [...randLetters, ...correctLetter];
             // 
         }
