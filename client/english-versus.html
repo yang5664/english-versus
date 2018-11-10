@@ -360,6 +360,7 @@ function start() {
         let dropLetter = new Sprite(id[`font/${letter}.png`]);
         dropLetter.anchor.set(0.5);
 
+
         // 加到遊戲場景
         gameScene.addChild(dropLetter);
         dropLetter.x = Math.floor(Math.random() * (gameScene.width - 50 + 1) + 50);
@@ -373,7 +374,6 @@ function start() {
                         dropLetter.y = dropLetter.y - 50
                         tm.kill({y:true}, dropLetter);
                         gameScene.removeChild(dropLetter);
-                        // console.log('hit a', letter);
                         // 檢查玩家拼字
                         playerA.collect.push(letter);
                         checkPlayerWord(playerA);
@@ -382,18 +382,17 @@ function start() {
                         dropLetter.y = dropLetter.y - 50
                         tm.kill({y:true}, dropLetter);
                         gameScene.removeChild(dropLetter);
-                        // console.log('hit b', letter);
                         // 檢查玩家拼字
                         playerB.collect.push(letter);
                         checkPlayerWord(playerB);
                     }
                 },
                 onComplete: function() {
-                    // gameScene.removeChild(dropLetter);
+                    gameScene.removeChild(dropLetter);
                 }
             }
         );
-    }, 1300);
+    }, 900);
 }
 
 // 遊戲進行
@@ -525,16 +524,16 @@ function hitTestRectangle(r1, r2) {
     hit = false;
 
     //Find the center points of each sprite
-    r1.centerX = r1.x + r1.width / 2;
-    r1.centerY = r1.y + r1.height / 2;
-    r2.centerX = r2.x + r2.width / 2;
-    r2.centerY = r2.y + r2.height / 2;
+    r1.centerX = r1.x + r1.width;
+    r1.centerY = r1.y + r1.height;
+    r2.centerX = r2.x + r2.width;
+    r2.centerY = r2.y + r2.height;
 
     //Find the half-widths and half-heights of each sprite
-    r1.halfWidth = r1.width / 2;
-    r1.halfHeight = r1.height / 2;
-    r2.halfWidth = r2.width / 2;
-    r2.halfHeight = r2.height / 2;
+    r1.halfWidth = r1.width;
+    r1.halfHeight = r1.height;
+    r2.halfWidth = r2.width;
+    r2.halfHeight = r2.height;
 
     //Calculate the distance vector between the sprites
     vx = r1.centerX - r2.centerX;
