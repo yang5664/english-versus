@@ -1,0 +1,72 @@
+{"frames": {
+
+"alien1/alien1-1.png":
+{
+	"frame": {"x":851,"y":1,"w":192,"h":148},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":192,"h":148},
+	"sourceSize": {"w":192,"h":148}
+},
+"alien1/alien1-2.png":
+{
+	"frame": {"x":657,"y":1,"w":192,"h":147},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":1,"w":192,"h":147},
+	"sourceSize": {"w":192,"h":148}
+},
+"alien1/alien1-3.png":
+{
+	"frame": {"x":463,"y":1,"w":192,"h":145},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":3,"w":192,"h":145},
+	"sourceSize": {"w":192,"h":148}
+},
+"alien2/alien2-1.png":
+{
+	"frame": {"x":309,"y":1,"w":152,"h":136},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":152,"h":136},
+	"sourceSize": {"w":152,"h":136}
+},
+"alien2/alien2-2.png":
+{
+	"frame": {"x":155,"y":1,"w":152,"h":134},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":2,"w":152,"h":134},
+	"sourceSize": {"w":152,"h":136}
+},
+"alien2/alien2-3.png":
+{
+	"frame": {"x":1,"y":1,"w":152,"h":132},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":4,"w":152,"h":132},
+	"sourceSize": {"w":152,"h":136}
+},
+"bg.PNG":
+{
+	"frame": {"x":1,"y":151,"w":1024,"h":640},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":1024,"h":640},
+	"sourceSize": {"w":1024,"h":640}
+}},
+"animations": {
+	"alien1/alien1": ["alien1/alien1-1.png","alien1/alien1-2.png","alien1/alien1-3.png"],
+	"alien2/alien2": ["alien2/alien2-1.png","alien2/alien2-2.png","alien2/alien2-3.png"]
+},
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "gamejam.png",
+	"format": "RGBA8888",
+	"size": {"w":1044,"h":792},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:401710c6b9794b35a053e93f42d64483:836125eefc54d782a42855c8b5f2a227:390fcf15171b0369153d9652e9e06e5b$"
+}
+}

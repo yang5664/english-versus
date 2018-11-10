@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+
+    html, body{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #000;
+    }
+</style>
+<body>
+    <script src="https://code.createjs.com/1.0.0/soundjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenMax.min.js"></script>
+    <script src="pixi/pixi.min.js"></script>
+    <script type="text/javascript">
+// 網路
+var ws;
+function WebSocketTest() {
+
+    if ("WebSocket" in window) {
+        // alert("WebSocket is supported by your Browser!");
+
+        // Let us open a web socket
+        ws = new WebSocket("ws://172.20.10.4:8000/ws");
+        // ws = new WebSocket("ws://127.0.0.1:8000/ws");
+
+        ws.onopen = function() {
+            console.log("Connection is connected...");
+        };
+
+        ws.onmessage = function (evt) {
+            var received_msg = evt.data;
+            var obj = JSON.parse(received_msg);
+            event = JSON.parse(obj.message);
+            switch (event.data) {
+                case 'left_up':
+                    leftA.release();
+                break;
+                case 'left_down':
+                    leftA.press();
+                break;
+                case 'right_up':
+                    rightA.release();
+                break;
+                case 'right_down':
+                    rightA.press();
+                break;
+                case 'jump_up':
+                    jumpA.release();
+                break;
+                case 'jump_down':
+                    jumpA.press();
+                break;
+            }
+            // showLog(obj.message);
+        };
+
+        ws.onclose = function() {
+            console.log("Connection is closed...");
+        };
+    } else {
+
+        // The browser doesn't support WebSocket
+        console.log("WebSocket NOT supported by your Browser!");
+    }
+
+    function showLog(val){
+        var log = document.getElementById("log");
+        log.innerHTML += val + " <br/>";
+    }
+
+    function setPlayground() {
+        ws.send(JSON.stringify({
+            type: "playground",
+            channel: "1",
+            message: ""
+        }));
+    }
+}
+
+function AnimateMovieClip(scene, texture) {
+    PIXI.extras.AnimatedSprite.call(this, texture);
+    this.anchor.set(0.5);
+    scene.addChild(this);
+}
+AnimateMovieClip.prototype = Object.create(PIXI.extras.AnimatedSprite.prototype);
+// 遊戲
+//Aliases
+let Application = PIXI.Application,
+    Container = PIXI.Container,
+    loader = PIXI.loader,
+    resources = PIXI.loader.resources,
+    Graphics = PIXI.Graphics,
+    TextureCache = PIXI.utils.TextureCache,
+    Sprite = PIXI.Sprite,
+    Text = PIXI.Text,
+    TextStyle = PIXI.TextStyle;
+
+//Create a Pixi Application
+let app = new Application({
+    width: 1600,
+    height: 900,
+    antialiasing: true,
+    transparent: false,
+    resolution: 1
+  }
+);
+
+document.body.appendChild(app.view);
+
+loader
+  .add("assets/gamejam.json")
+  .load(setup);
+
+
+// 建立遊戲物件
+let playerA, playerB, isJumpA, isJumpB, playerA_vy = 0, playerB_vy = 0,
+    leftA, rightA, jumpA, leftB, rightB, jumpB,
+    timerBoard, ground,
+    state, letters, wordList, correctLetter, randLetters, dropLetter,
+    gameSceneBegin, gameScene, gameSceneOver, id,
+    timerInterval, letterDropInterval;
+
+var fontStyle = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 80,
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        fill: ['#ffffff', '#00ff99'], // gradient
+        stroke: '#4a1850',
+        strokeThickness: 5,
+        dropShadow: true,
+        dropShadowColor: '#000000',
+        dropShadowBlur: 4,
+        dropShadowAngle: Math.PI / 6,
+        dropShadowDistance: 6,
+        wordWrap: true,
+        wordWrapWidth: 440
+    });
+const footer = 650;
+
+// 遊戲配置
+function setup() {
+    id = resources["assets/gamejam.json"].textures;
+
+    /*
+     * 啟動畫面
+     */
+    gameSceneBegin = new Container();
+    app.stage.addChild(gameSceneBegin);
+
+    let bg = new Sprite(id["bg.PNG"]);
+    gameSceneBegin.addChild(bg);
+    bg.width = 1600;
+    bg.height = 900;
+    /*
+     * 遊戲畫面
+     */
+    gameScene = new Container();
+    app.stage.addChild(gameScene);
+    gameScene.visible = true;
+    // 玩家A
+    let PlayerAfF = [
+        PIXI.Texture.fromFrame("alien1/alien1-1.png"),
+        PIXI.Texture.fromFrame("alien1/alien1-2.png"),
+        PIXI.Texture.fromFrame("alien1/alien1-3.png")
+    ];
+    playerA = new PIXI.extras.MovieClip(PlayerAfF);
+    playerA.position.set(300);
+    playerA.anchor.set(0.5, 0);
+    playerA.animationSpeed = 0.5;
+    playerA.x = 200;
+    playerA.y = footer ;
+    playerA.vx = 0;
+    playerA.vy = 0;
+
+    playerA.collect = []; // 目前蒐集的字母
+    playerA.doneList = []; // 完成的單字
+    playerA.play();
+    gameScene.addChild(playerA);
+    // 玩家B
+    let PlayerBfF = [
+        PIXI.Texture.fromFrame("alien2/alien2-1.png"),
+        PIXI.Texture.fromFrame("alien2/alien2-2.png"),
+        PIXI.Texture.fromFrame("alien2/alien2-3.png")
+    ];
+    playerB = new PIXI.extras.MovieClip(PlayerBfF);
+    playerB.position.set(300);
+    playerB.anchor.set(0.5, 0);
+    playerB.animationSpeed = 0.5;
+    playerB.x = app.stage.width - 200;
+    playerB.y = footer;
+    playerB.vx = 0;
+    playerB.vy = 0;
+    playerB.collect = []; // 目前蒐集的字母
+    playerB.doneList = []; // 完成的單字
+    playerB.play();
+
+    gameScene.addChild(playerB);
+
+    /*
+     * 遊戲結束畫面
+     */
+    gameSceneOver = new Container();
+    app.stage.addChild(gameSceneOver);
+    gameSceneOver.visible = false;
+
+    /*
+     * 初始化 A-Z 字母
+     */
+     wordList = [
+        'CAT',
+        'DOG',
+        'SNAKE',
+        'FISH',
+        'CAR'
+     ];
+    /*
+     * 建立遊戲需要的字母
+     */
+    genLetters();
+
+    /*
+     * 控制器
+     */
+    // 玩家A
+    leftA = keyboard(65),
+    rightA = keyboard(68),
+    jumpA = keyboard(70);
+
+    leftA.press = function() {
+        playerA.vx = -5;
+        playerA.vy = 0;
+    }
+    leftA.release = function() {
+        if (!rightA.isDown && playerA.vy === 0) {
+            playerA.vx = 0;
+        }
+    }
+    rightA.press = function() {
+        playerA.vx = 5;
+        playerA.vy = 0;
+    }
+    rightA.release = function() {
+        if (!leftA.isDown && playerA.vy === 0) {
+            playerA.vx = 0;
+        }
+    }
+    jumpA.press = function() {
+        isJumpA = true;
+    }
+    jumpA.release = function() {
+        isJumpA = false;
+    }
+    // 玩家B
+    leftB = keyboard(37),
+    rightB = keyboard(39),
+    jumpB = keyboard(32);
+
+    leftB.press = function() {
+        playerB.vx = -5;
+        playerB.vy = 0;
+    }
+    leftB.release = function() {
+        if (!rightB.isDown && playerB.vy === 0) {
+            playerB.vx = 0;
+        }
+    }
+    rightB.press = function() {
+        playerB.vx = 5;
+        playerB.vy = 0;
+    }
+    rightB.release = function() {
+        if (!leftB.isDown && playerB.vy === 0) {
+            playerB.vx = 0;
+        }
+    }
+    jumpB.press = function() {
+        isJumpB = true;
+    }
+    jumpB.release = function() {
+        isJumpB = false;
+    }
+
+    // 其他
+    state = play
+    app.ticker.add(delta => gameLoop(delta));
+    WebSocketTest();
+    start();
+}
+
+// 遊戲循環
+function gameLoop(delta) {
+    state(delta);
+}
+// 遊戲開始
+function start() {
+
+    timerInterval = setInterval(function(){
+        
+    }, 1000);
+    
+    letterDropInterval = setInterval(function(){
+        /*
+        let idx = Math.random() * randLetters.length | 0,
+            letter = randLetters[idx];
+        dropLetter = new PIXI.Text(letter, fontStyle);
+        */
+        dropLetter = new PIXI.Graphics();
+        dropLetter.lineStyle(0);
+        dropLetter.beginFill(0xFFFF0B, 0.5);
+        dropLetter.drawCircle(0, 0, 20);
+        dropLetter.endFill();
+        // 加到遊戲場景
+        gameScene.addChild(dropLetter);
+        dropLetter.x = Math.floor(Math.random() * (gameScene.width - 50 + 1) + 50);
+        dropLetter.y = -20;
+        let tm = TweenMax.to(dropLetter, 3.5,
+            {
+                y: 900,
+                onUpdate: function(){
+                    if (hitTestRectangle(playerA, dropLetter)) {
+                        console.log('hit a');
+                        playerA.collect.push(letter);
+                        gameScene.removeChild(dropLetter);
+                        // 檢查玩家拼字
+                        checkPlayerWord(playerA);
+                        tm.kill({y:true}, dropLetter);
+                    }
+                    if (hitTestRectangle(playerB, dropLetter)) {
+                        console.log('hit b');
+                        playerB.collect.push(letter);
+                        gameScene.removeChild(dropLetter);
+                        // 檢查玩家拼字
+                        checkPlayerWord(playerB);
+                        tm.kill({y:true}, dropLetter);
+                    }
+                },
+                onComplete: function() {
+                    // gameScene.removeChild(dropLetter);
+                }
+            }
+        );
+    }, 800);
+}
+
+// 遊戲進行
+function play(delta) {
+    // A 玩家移動
+    playerA.x += playerA.vx;
+    g = playerA.y >= footer ? 0 : 0.3;
+    playerA_vy += g;
+    playerA.y += playerA_vy;
+    if(playerA.y >= footer) playerA.y = footer;
+    // B
+    playerB.x += playerB.vx;
+    g = playerB.y >= footer ? 0 : 0.3;
+    playerB_vy += g;
+    playerB.y += playerB_vy;
+    if(playerB.y >= footer) playerB.y = footer;
+
+    if (isJumpA) {
+        playerA_vy = -7;
+        isJumpA = false;
+    }
+
+    if (isJumpB) {
+        playerB_vy = -7;
+        isJumpB = false;
+    }
+}
+
+// 檢查玩家拼字
+function checkPlayerWord(player) {
+
+    if (player.collect.length == correctLetter.length) {
+        player.collect.forEach(function(idx, letter){
+            if (correctLetter[idx] != letter) {
+                player.collect = [];
+            }
+        });
+        if (player.collect.length > 0) {
+            player.doneList.push(playerA.collect.join(''));
+            player.collect = [];
+        }
+    }
+    //
+    if (player.collect.length > correctLetter.length) {
+        player.collect = [];
+    }
+}
+
+// 產生字母
+function genLetters() {
+    // 正確答案
+    correctLetter = [];
+    idx = Math.random() * wordList.length | 0
+    wordList[idx].split("").forEach(function(letter) {
+        correctLetter.push(letter);
+    });
+    // 隨機字母
+    randLetters = [];
+    let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    for(let i=0; i < 10; i++) {
+        idx = Math.random() * 26 | 0
+        randLetters.push(letters[idx]);
+    }
+    randLetters = [...randLetters, ...correctLetter];
+    // 
+}
+
+// 遊戲結束
+function end() {
+    gameScene.visible = false;
+    gameSceneOver.visible = true;
+}
+
+/* Helper functions */
+
+function contain(sprite, container) {
+
+    let collision = undefined;
+
+    //Left
+    if (sprite.x < container.x) {
+        sprite.x = container.x;
+        collision = "left";
+    }
+
+    //Top
+    if (sprite.y < container.y) {
+        sprite.y = container.y;
+        collision = "top";
+    }
+
+    //Right
+    if (sprite.x + sprite.width > container.width) {
+        sprite.x = container.width - sprite.width;
+        collision = "right";
+    }
+
+    //Bottom
+    if (sprite.y + sprite.height > container.height) {
+        sprite.y = container.height - sprite.height;
+        collision = "bottom";
+    }
+
+    //Return the `collision` value
+    return collision;
+}
+
+//The `hitTestRectangle` function
+function hitTestRectangle(r1, r2) {
+
+    //Define the variables we'll need to calculate
+    let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
+
+    //hit will determine whether there's a collision
+    hit = false;
+
+    //Find the center points of each sprite
+    r1.centerX = r1.x + r1.width / 2;
+    r1.centerY = r1.y + r1.height / 2;
+    r2.centerX = r2.x + r2.width / 2;
+    r2.centerY = r2.y + r2.height / 2;
+
+    //Find the half-widths and half-heights of each sprite
+    r1.halfWidth = r1.width / 2;
+    r1.halfHeight = r1.height / 2;
+    r2.halfWidth = r2.width / 2;
+    r2.halfHeight = r2.height / 2;
+
+    //Calculate the distance vector between the sprites
+    vx = r1.centerX - r2.centerX;
+    vy = r1.centerY - r2.centerY;
+
+    //Figure out the combined half-widths and half-heights
+    combinedHalfWidths = r1.halfWidth + r2.halfWidth;
+    combinedHalfHeights = r1.halfHeight + r2.halfHeight;
+
+    console.log(vx);
+    console.log(combinedHalfWidths);
+    //Check for a collision on the x axis
+    if (Math.abs(vx) < combinedHalfWidths) {
+
+        //A collision might be occuring. Check for a collision on the y axis
+        if (Math.abs(vy) < combinedHalfHeights) {
+
+            //There's definitely a collision happening
+            hit = true;
+        } else {
+
+            //There's no collision on the y axis
+            hit = false;
+        }
+    } else {
+
+        //There's no collision on the x axis
+        hit = false;
+    }
+
+    //`hit` will be either `true` or `false`
+    return hit;
+};
+
+
+//The `randomInt` helper function
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+//The `keyboard` helper function
+function keyboard(keyCode) {
+    var key = {};
+    key.code = keyCode;
+    key.isDown = false;
+    key.isUp = true;
+    key.press = undefined;
+    key.release = undefined;
+    //The `downHandler`
+    key.downHandler = function(event) {
+        if (event.keyCode === key.code) {
+            if (key.isUp && key.press) key.press();
+            key.isDown = true;
+            key.isUp = false;
+        }
+        event.preventDefault();
+    };
+
+    //The `upHandler`
+    key.upHandler = function(event) {
+        if (event.keyCode === key.code) {
+            if (key.isDown && key.release) key.release();
+            key.isDown = false;
+            key.isUp = true;
+        }
+        event.preventDefault();
+    };
+
+    //Attach event listeners
+    window.addEventListener(
+        "keydown", key.downHandler.bind(key), false
+    );
+    window.addEventListener(
+        "keyup", key.upHandler.bind(key), false
+    );
+    return key;
+}
+    </script>
+</body>
+</html>
