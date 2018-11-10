@@ -9,7 +9,9 @@ import (
 
 var clients = make(map[*websocket.Conn]bool) // connected clients
 var broadcast = make(chan Message)           // broadcast channel
-
+var players [2]Player						 // connected players
+var playground = new(Playground)		 	 // one Playground
+var counter int								 // connected counter
 // Configure the upgrader
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -22,6 +24,16 @@ type Message struct {
 	Type    string `json:"type"`
 	Channel string `json:"channel"`
 	Message  string `json:"message"`
+}
+
+type Player struct {
+	conn    *websocket.Conn
+	name	string
+}
+
+type Playground struct {
+	conn    *websocket.Conn
+	id 		int
 }
 
 func main() {
@@ -55,8 +67,16 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 	// Register our new client
 	clients[ws] = true
 
+	counter++
+
+	if counter == 1 {
+		playground.conn = ws
+		playground.id = counter
+	}
+
 	for {
 		var msg Message
+
 		// Read in a new message as JSON and map it to a Message object
 		err := ws.ReadJSON(&msg)
 		if err != nil {
@@ -73,17 +93,21 @@ func handleMessages() {
 	for {
 		// Grab the next message from the broadcast channel
 		msg := <-broadcast
-		log.Println(msg.Type)
-		log.Println(msg.Channel)
-		log.Println(msg.Message)
-		// Send it out to every client that is currently connected
-		for client := range clients {
-			err := client.WriteJSON(msg)
-			if err != nil {
-				log.Printf("error: %v", err)
-				client.Close()
-				delete(clients, client)
+
+		if msg.Type == "action" {
+			playground.conn.WriteJSON(msg)
+		} else {
+			// Send it out to every client that is currently connected
+			for client := range clients {
+				err := client.WriteJSON(msg)
+				if err != nil {
+					log.Printf("error: %v", err)
+					client.Close()
+					delete(clients, client)
+				}
 			}
 		}
+
+
 	}
 }
