@@ -125,10 +125,11 @@ loader
 // 建立遊戲物件
 let playerA, playerB, isJumpA, isJumpB, playerA_vy = 0, playerB_vy = 0,
     leftA, rightA, jumpA, leftB, rightB, jumpB,
-    timerBoard, ground,
+    timerBoard, currentWordBoard,
     state, letters, wordList, correctLetter, randLetters, dropLetter,
     gameSceneBegin, gameScene, gameSceneOver, id,
-    timerInterval, letterDropInterval;
+    timerInterval, letterDropInterval, 
+    timer = 600;
 
 var fontStyle = new PIXI.TextStyle({
         fontFamily: 'Arial',
@@ -168,6 +169,16 @@ function setup() {
     gameScene = new Container();
     app.stage.addChild(gameScene);
     gameScene.visible = true;
+    // 計時板
+    timerBoard = new PIXI.Text(60, fontStyle);
+    timerBoard.x = app.stage.width / 2 - 20;
+    timerBoard.y = 100;
+    gameScene.addChild(timerBoard);
+    // 目前字母
+    currentWordBoard = new PIXI.Text('APPLE', fontStyle);
+    currentWordBoard.x = app.stage.width / 2 - 100;
+    currentWordBoard.y = 20;
+    gameScene.addChild(currentWordBoard);
     // 玩家A
     let PlayerAfF = [
         PIXI.Texture.fromFrame("alien1/alien1-1.png"),
@@ -182,11 +193,15 @@ function setup() {
     playerA.y = footer ;
     playerA.vx = 0;
     playerA.vy = 0;
-
     playerA.collect = []; // 目前蒐集的字母
     playerA.doneList = []; // 完成的單字
     playerA.play();
     gameScene.addChild(playerA);
+    // 字母蒐集板
+    playerA.board = new PIXI.Text('', fontStyle);
+    playerA.board.x = 200;
+    playerA.board.y = 100;
+    gameScene.addChild(playerA.board);
     // 玩家B
     let PlayerBfF = [
         PIXI.Texture.fromFrame("alien2/alien2-1.png"),
@@ -204,8 +219,11 @@ function setup() {
     playerB.collect = []; // 目前蒐集的字母
     playerB.doneList = []; // 完成的單字
     playerB.play();
-
     gameScene.addChild(playerB);
+    playerB.board = new PIXI.Text('', fontStyle);
+    playerB.board.x = app.stage.width - 350;
+    playerB.board.y = 100;
+    gameScene.addChild(playerB.board);
 
     /*
      * 遊戲結束畫面
@@ -220,9 +238,15 @@ function setup() {
      wordList = [
         'CAT',
         'DOG',
-        'SNAKE',
-        'FISH',
-        'CAR'
+        'BUG',
+        'CAR',
+        'BEE',
+        'JAM',
+        'JOB',
+        'JOY',
+        'FOX',
+        'COW',
+        'ZOO'
      ];
     /*
      * 建立遊戲需要的字母
@@ -306,20 +330,16 @@ function gameLoop(delta) {
 function start() {
 
     timerInterval = setInterval(function(){
-        
+        timer--;
+        if (timer<=0) state = end;
+        timerBoard.setText(timer);
+
     }, 1000);
     
     letterDropInterval = setInterval(function(){
-        /*
         let idx = Math.random() * randLetters.length | 0,
             letter = randLetters[idx];
         dropLetter = new PIXI.Text(letter, fontStyle);
-        */
-        dropLetter = new PIXI.Graphics();
-        dropLetter.lineStyle(0);
-        dropLetter.beginFill(0xFFFF0B, 0.5);
-        dropLetter.drawCircle(0, 0, 20);
-        dropLetter.endFill();
         // 加到遊戲場景
         gameScene.addChild(dropLetter);
         dropLetter.x = Math.floor(Math.random() * (gameScene.width - 50 + 1) + 50);
@@ -329,20 +349,22 @@ function start() {
                 y: 900,
                 onUpdate: function(){
                     if (hitTestRectangle(playerA, dropLetter)) {
-                        console.log('hit a');
-                        playerA.collect.push(letter);
-                        gameScene.removeChild(dropLetter);
-                        // 檢查玩家拼字
-                        checkPlayerWord(playerA);
+                        dropLetter.y = dropLetter.y - 50
                         tm.kill({y:true}, dropLetter);
+                        gameScene.removeChild(dropLetter);
+                        // console.log('hit a', letter);
+                        // 檢查玩家拼字
+                        playerA.collect.push(letter);
+                        checkPlayerWord(playerA);
                     }
                     if (hitTestRectangle(playerB, dropLetter)) {
-                        console.log('hit b');
-                        playerB.collect.push(letter);
-                        gameScene.removeChild(dropLetter);
-                        // 檢查玩家拼字
-                        checkPlayerWord(playerB);
+                        dropLetter.y = dropLetter.y - 50
                         tm.kill({y:true}, dropLetter);
+                        gameScene.removeChild(dropLetter);
+                        // console.log('hit b', letter);
+                        // 檢查玩家拼字
+                        playerB.collect.push(letter);
+                        checkPlayerWord(playerB);
                     }
                 },
                 onComplete: function() {
@@ -350,7 +372,7 @@ function start() {
                 }
             }
         );
-    }, 800);
+    }, 1800);
 }
 
 // 遊戲進行
@@ -383,20 +405,32 @@ function play(delta) {
 function checkPlayerWord(player) {
 
     if (player.collect.length == correctLetter.length) {
-        player.collect.forEach(function(idx, letter){
+        player.collect.forEach(function(letter, idx){
             if (correctLetter[idx] != letter) {
                 player.collect = [];
             }
         });
         if (player.collect.length > 0) {
-            player.doneList.push(playerA.collect.join(''));
+            player.doneList.push(player.collect.join(''));
             player.collect = [];
+            console.log(player.doneList);
+            genLetters();
         }
     }
     //
     if (player.collect.length > correctLetter.length) {
         player.collect = [];
     }
+    // 若搜集到的字母沒按照順序清除
+    if (player.collect.length < correctLetter.length) {
+        player.collect.forEach(function(letter, idx){
+            if (correctLetter[idx] != letter) {
+                player.collect = [];
+            }
+        });
+    }
+
+    player.board.setText(player.collect.join(""));
 }
 
 // 產生字母
@@ -409,11 +443,14 @@ function genLetters() {
     });
     // 隨機字母
     randLetters = [];
+    /*
     let letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-    for(let i=0; i < 10; i++) {
+    for(let i=0; i < 3; i++) {
         idx = Math.random() * 26 | 0
         randLetters.push(letters[idx]);
     }
+    */
+    currentWordBoard.setText(correctLetter.join(""));
     randLetters = [...randLetters, ...correctLetter];
     // 
 }
@@ -460,7 +497,6 @@ function contain(sprite, container) {
 
 //The `hitTestRectangle` function
 function hitTestRectangle(r1, r2) {
-
     //Define the variables we'll need to calculate
     let hit, combinedHalfWidths, combinedHalfHeights, vx, vy;
 
@@ -487,8 +523,6 @@ function hitTestRectangle(r1, r2) {
     combinedHalfWidths = r1.halfWidth + r2.halfWidth;
     combinedHalfHeights = r1.halfHeight + r2.halfHeight;
 
-    console.log(vx);
-    console.log(combinedHalfWidths);
     //Check for a collision on the x axis
     if (Math.abs(vx) < combinedHalfWidths) {
 
