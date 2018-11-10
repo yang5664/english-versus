@@ -1,9 +1,24 @@
 <!DOCTYPE HTML>
 
 <html>
+<meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1,initial-scale=1,user-scalable=no" />
 <head>
 <title>Controller</title>
     <script type = "text/javascript">
+    document.addEventListener('touchstart',function (event) { 
+      if(event.touches.length>1){ 
+        event.preventDefault(); 
+      } 
+    }) 
+    var lastTouchEnd=0; 
+    document.addEventListener('touchend',function (event) { 
+      var now=(new Date()).getTime(); 
+      if(now-lastTouchEnd<=300){ 
+        event.preventDefault(); 
+      } 
+      lastTouchEnd=now; 
+    },false) 
+
     var ws;
         function WebSocketTest() {
 
@@ -57,14 +72,15 @@
 <body>
 <div id = "sse">
     Controller <br/>
-    <button type="button" onClick="javascript:WebSocketTest();">connect</button>
-    <button type="button" onClick="javascript:sentLogin('Harland');">login</button>
+    <button type="button" style="height:100px;width:100px" onClick="javascript:WebSocketTest();">connect</button>
+    <button type="button" style="height:100px;width:100px" onClick="javascript:sentLogin('Harland');">login</button>
+    <button type="button" style="height:100px;width:100px" onClick="javascript:ws.close();">disconnect</button><br/>
+    
+    <button type="button" style="height:100px;width:100px" ontouchstart="javascript:sentAction('left_down');" ontouchend="javascript:sentAction('left_up');">left</button>
+    <button type="button" style="height:100px;width:100px" ontouchstart="javascript:sentAction('right_down');" ontouchend="javascript:sentAction('right_up');">right</button>
+    <button type="button" style="height:100px;width:100px" ontouchstart="javascript:sentAction('jump_down');" ontouchend="javascript:sentAction('jump_up');">jump</button>
 
-    <button type="button" onClick="javascript:sentAction('right');">right</button>
-    <button type="button" onClick="javascript:sentAction('left');">left</button>
-    <button type="button" onClick="javascript:sentAction('jump');">jump</button>
-
-    <button type="button" onClick="javascript:ws.close();">disconnect</button>
+    
 
 </div>
 
