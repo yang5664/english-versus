@@ -147,7 +147,7 @@ var fontStyle = new PIXI.TextStyle({
         wordWrap: true,
         wordWrapWidth: 440
     });
-const footer = 650;
+const footer = 700;
 
 // 遊戲配置
 function setup() {
@@ -179,15 +179,17 @@ function setup() {
     currentWordBoard.x = app.stage.width / 2 - 100;
     currentWordBoard.y = 20;
     gameScene.addChild(currentWordBoard);
+
+
     // 玩家A
     let PlayerAfF = [
         PIXI.Texture.fromFrame("alien1/alien1-1.png"),
         PIXI.Texture.fromFrame("alien1/alien1-2.png"),
         PIXI.Texture.fromFrame("alien1/alien1-3.png")
     ];
-    playerA = new PIXI.extras.MovieClip(PlayerAfF);
-    playerA.position.set(300);
-    playerA.anchor.set(0.5, 0);
+    playerA = new PIXI.extras.AnimatedSprite(PlayerAfF);
+    // playerA.position.set(300);
+    playerA.anchor.set(0.5);
     playerA.animationSpeed = 0.5;
     playerA.x = 200;
     playerA.y = footer ;
@@ -196,6 +198,12 @@ function setup() {
     playerA.collect = []; // 目前蒐集的字母
     playerA.doneList = []; // 完成的單字
     playerA.play();
+
+    let graphics = new PIXI.Graphics();
+    graphics.lineStyle(2, 0x0000FF, 1);
+    graphics.drawRect( -playerA.width / 2, -playerA.height / 2, playerA.width, playerA.height);
+    
+    playerA.addChild(graphics);
     gameScene.addChild(playerA);
     // 字母蒐集板
     playerA.board = new PIXI.Text('', fontStyle);
@@ -208,9 +216,9 @@ function setup() {
         PIXI.Texture.fromFrame("alien2/alien2-2.png"),
         PIXI.Texture.fromFrame("alien2/alien2-3.png")
     ];
-    playerB = new PIXI.extras.MovieClip(PlayerBfF);
-    playerB.position.set(300);
-    playerB.anchor.set(0.5, 0);
+    playerB = new PIXI.extras.AnimatedSprite(PlayerBfF);
+    // playerB.position.set(300);
+    playerB.anchor.set(0.5);
     playerB.animationSpeed = 0.5;
     playerB.x = app.stage.width - 200;
     playerB.y = footer;
@@ -219,7 +227,15 @@ function setup() {
     playerB.collect = []; // 目前蒐集的字母
     playerB.doneList = []; // 完成的單字
     playerB.play();
+
+
+    let graphics2 = new PIXI.Graphics();
+    graphics2.lineStyle(2, 0x0000FF, 1);
+    graphics2.drawRect(-playerB.width/2, -playerB.height/2, playerB.width, playerB.height);
+
+    playerB.addChild(graphics2);
     gameScene.addChild(playerB);
+
     playerB.board = new PIXI.Text('', fontStyle);
     playerB.board.x = app.stage.width - 350;
     playerB.board.y = 100;
@@ -337,16 +353,21 @@ function start() {
     }, 1000);
     
     letterDropInterval = setInterval(function(){
+
         let idx = Math.random() * randLetters.length | 0,
             letter = randLetters[idx];
-        dropLetter = new PIXI.Text(letter, fontStyle);
+
+        let dropLetter = new Sprite(id[`font/${letter}.png`]);
+        dropLetter.anchor.set(0.5);
+
         // 加到遊戲場景
         gameScene.addChild(dropLetter);
         dropLetter.x = Math.floor(Math.random() * (gameScene.width - 50 + 1) + 50);
         dropLetter.y = -20;
-        let tm = TweenMax.to(dropLetter, 3.5,
+
+        let tm = TweenMax.to(dropLetter, 5,
             {
-                y: 900,
+                y: 1300,
                 onUpdate: function(){
                     if (hitTestRectangle(playerA, dropLetter)) {
                         dropLetter.y = dropLetter.y - 50
@@ -372,7 +393,7 @@ function start() {
                 }
             }
         );
-    }, 1800);
+    }, 1300);
 }
 
 // 遊戲進行
