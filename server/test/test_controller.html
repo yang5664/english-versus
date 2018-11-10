@@ -16,7 +16,6 @@
 
                 ws.onopen = function() {
                     console.log("Connection is connected...");
-                    // Web Socket is connected, send data using send()
                 };
 
                 ws.onmessage = function (evt) {
@@ -25,7 +24,6 @@
                 };
 
                 ws.onclose = function() {
-                    // websocket is closed.
                     console.log("Connection is closed...");
                 };
             } else {
