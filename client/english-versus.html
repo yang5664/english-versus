@@ -194,9 +194,6 @@
             lightA.y = playerA.height;
             lightA.alpha = 0;
 
-
-
-
             // 玩家B
             let PlayerBfF = [
                 PIXI.Texture.fromFrame("alien2/alien2-1.png"),
@@ -375,8 +372,9 @@
                 let tm = TweenMax.to(dropLetter, 5,
                     {
                         y: 1300,
-                        onUpdate: function(){
+                        onUpdate: ()=>{
                             if (hitTestRectangle(playerA, dropLetter)) {
+                                BombEf(dropLetter.x, dropLetter.y);
                                 dropLetter.y = dropLetter.y - 50
                                 tm.kill({y:true}, dropLetter);
                                 gameScene.removeChild(dropLetter);
@@ -385,6 +383,7 @@
                                 checkPlayerWord(playerA);
                             }
                             if (hitTestRectangle(playerB, dropLetter)) {
+                                BombEf(dropLetter.x, dropLetter.y);
                                 dropLetter.y = dropLetter.y - 50
                                 tm.kill({y:true}, dropLetter);
                                 gameScene.removeChild(dropLetter);
@@ -393,15 +392,42 @@
                                 checkPlayerWord(playerB);
                             }
                         },
-                        onComplete: function() {
+                        onComplete: ()=> {
                             gameScene.removeChild(dropLetter);
                         }
                     }
                 );
             }, 900);
         }
-        
-        
+
+        function BombEf(x, y) {
+             // 爆炸
+             let BombAf = [
+                PIXI.Texture.fromFrame("explosion/explosion0.png"),
+                PIXI.Texture.fromFrame("explosion/explosion1.png"),
+                PIXI.Texture.fromFrame("explosion/explosion2.png"),
+                PIXI.Texture.fromFrame("explosion/explosion3.png"),
+                PIXI.Texture.fromFrame("explosion/explosion4.png"),
+                PIXI.Texture.fromFrame("explosion/explosion5.png"),
+                PIXI.Texture.fromFrame("explosion/explosion6.png"),
+                PIXI.Texture.fromFrame("explosion/explosion7.png"),
+            ];
+            Bomb1 = new PIXI.extras.AnimatedSprite(BombAf);
+            Bomb1.animationSpeed = 0.3;
+            gameScene.addChild(Bomb1);
+            Bomb1.loop = false;
+            Bomb1.anchor.x = 0.5;
+            Bomb1.anchor.y = 0.5;
+            Bomb1.scale.x = 0.5;
+            Bomb1.scale.y = 0.5;
+            Bomb1.x = x;
+            Bomb1.y = y;
+            Bomb1.play();
+            Bomb1.onComplete = ()=>{
+                gameScene.removeChild(Bomb1);
+            };
+        }
+
         function ligthAminiplayerA(idx) {
             TweenMax.to(lightA, 0.5,{alpha: 1});
             TweenMax.to(lightA_3, 0.5,{x: 1 * idx, y: 5});
