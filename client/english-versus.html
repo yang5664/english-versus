@@ -65,7 +65,9 @@
             state, letters, wordList, correctLetter, randLetters, dropLetter,
             gameSceneBegin, gameScene, gameSceneOver, id,
             timerInterval, letterDropInterval, Starbg1,
-            timer = 600;
+            timer = 600,
+            lightA, lightA_1, lightA_2, lightA_3, isPositionIdx = 1,
+            lightB, lightB_1, lightB_2, lightB_3
 
         var fontStyle = new PIXI.TextStyle({
                 fontFamily: 'Arial',
@@ -130,7 +132,6 @@
                 setTimeout(() => {
                     StarPosition(Starbg1);
                     Starbg1.gotoAndPlay(0);
-                    console.log('ok');
                 }, 1300);
             };
 
@@ -159,8 +160,6 @@
                 PIXI.Texture.fromFrame("alien1/alien1-3.png")
             ];
             playerA = new PIXI.extras.AnimatedSprite(PlayerAfF);
-            // playerA.position.set(300);
-            // playerA.anchor.set(0.5);
             playerA.animationSpeed = 0.5;
             playerA.x = 200;
             playerA.y = footer ;
@@ -169,18 +168,35 @@
             playerA.collect = []; // 目前蒐集的字母
             playerA.doneList = []; // 完成的單字
             playerA.play();
-
-            // let graphics = new PIXI.Graphics();
-            // graphics.lineStyle(2, 0x0000FF, 1);
-            // graphics.drawRect( 0, 0, playerA.width, playerA.height);
-            // playerA.addChild(graphics);
-            
             gameScene.addChild(playerA);
             // 字母蒐集板
             playerA.board = new Container();
             playerA.board.x = 200;
             playerA.board.y = 100;
             gameScene.addChild(playerA.board);
+
+            lightA = new Container();
+            lightA_1 = new Sprite(id[`light-1.png`]);
+            lightA_2 = new Sprite(id[`light-1.png`]);
+            lightA_3 = new Sprite(id[`light-1.png`]);
+
+            lightA.addChild(lightA_1);
+            lightA_1.scale.x = 0.5;
+            lightA_1.anchor.x = 0.5;
+            lightA.addChild(lightA_2);
+            lightA_2.scale.x = 0.8;
+            lightA_2.anchor.x = 0.5;
+            lightA.addChild(lightA_3);
+            lightA_3.scale.x = 1.6;
+            lightA_3.anchor.x = 0.5;
+            playerA.addChild(lightA);
+            lightA.x = playerA.width / 2;
+            lightA.y = playerA.height;
+            lightA.alpha = 0;
+
+
+
+
             // 玩家B
             let PlayerBfF = [
                 PIXI.Texture.fromFrame("alien2/alien2-1.png"),
@@ -188,8 +204,6 @@
                 PIXI.Texture.fromFrame("alien2/alien2-3.png")
             ];
             playerB = new PIXI.extras.AnimatedSprite(PlayerBfF);
-            // playerB.position.set(300);
-            // playerB.anchor.set(0.5);
             playerB.animationSpeed = 0.5;
             playerB.x = app.stage.width - 200;
             playerB.y = footer;
@@ -199,18 +213,33 @@
             playerB.doneList = []; // 完成的單字
             playerB.play();
 
-
-            // let graphics2 = new PIXI.Graphics();
-            // graphics2.lineStyle(2, 0x0000FF, 1);
-            // graphics2.drawRect(0, 0, playerB.width, playerB.height);
-            // playerB.addChild(graphics2);
-
             gameScene.addChild(playerB);
 
             playerB.board = new Container();
             playerB.board.x = app.stage.width - 350;
             playerB.board.y = 100;
             gameScene.addChild(playerB.board);
+
+
+            lightB = new Container();
+            lightB_1 = new Sprite(id[`light-2.png`]);
+            lightB_2 = new Sprite(id[`light-2.png`]);
+            lightB_3 = new Sprite(id[`light-2.png`]);
+            lightB.addChild(lightB_1);
+            lightB_1.scale.x = 0.5;
+            lightB_1.anchor.x = 0.5;
+            lightB.addChild(lightB_2);
+            lightB_2.scale.x = 0.8;
+            lightB_2.anchor.x = 0.5;
+            lightB.addChild(lightB_3);
+            lightB_3.scale.x = 1.6;
+            lightB_3.anchor.x = 0.5;
+            playerB.addChild(lightB);
+            lightB.x = playerB.width / 2;
+            lightB.y = playerB.height;
+            lightB.alpha = 0;
+
+
 
             /*
             * 遊戲結束畫面
@@ -251,19 +280,23 @@
             leftA.press = function() {
                 playerA.vx = -5;
                 playerA.vy = 0;
+                ligthAminiplayerA(5);
             }
             leftA.release = function() {
                 if (!rightA.isDown && playerA.vy === 0) {
                     playerA.vx = 0;
+                    ligthAminiplayerAUp();
                 }
             }
             rightA.press = function() {
                 playerA.vx = 5;
                 playerA.vy = 0;
+                ligthAminiplayerA(-5);
             }
             rightA.release = function() {
                 if (!leftA.isDown && playerA.vy === 0) {
                     playerA.vx = 0;
+                    ligthAminiplayerAUp();
                 }
             }
             jumpA.press = function() {
@@ -280,19 +313,23 @@
             leftB.press = function() {
                 playerB.vx = -5;
                 playerB.vy = 0;
+                ligthAminiplayerB(5);
             }
             leftB.release = function() {
                 if (!rightB.isDown && playerB.vy === 0) {
                     playerB.vx = 0;
+                    ligthAminiplayerBUp();
                 }
             }
             rightB.press = function() {
                 playerB.vx = 5;
                 playerB.vy = 0;
+                ligthAminiplayerB(-5);
             }
             rightB.release = function() {
                 if (!leftB.isDown && playerB.vy === 0) {
                     playerB.vx = 0;
+                    ligthAminiplayerBUp();
                 }
             }
             jumpB.press = function() {
@@ -330,8 +367,6 @@
 
                 let dropLetter = new Sprite(id[`font/${letter}.png`]);
                 // dropLetter.anchor.set(0.5);
-
-
                 // 加到遊戲場景
                 gameScene.addChild(dropLetter);
                 dropLetter.x = Math.floor(Math.random() * (gameScene.width - 50 + 1) + 50);
@@ -364,6 +399,51 @@
                     }
                 );
             }, 900);
+        }
+        
+        
+        function ligthAminiplayerA(idx) {
+            TweenMax.to(lightA, 0.5,{alpha: 1});
+            TweenMax.to(lightA_3, 0.5,{x: 1 * idx, y: 5});
+            TweenMax.to(lightA_2, 0.5,{x: 3 * idx, y: 20, delay: 0.05});
+            TweenMax.to(lightA_1, 0.5,{x: 7 * idx, y: 30, delay: 0.1});
+            TweenMax.to(lightA_3, 0.4,{alpha: 0, yoyo: true, repeat: -1});
+            TweenMax.to(lightA_2, 0.4,{alpha: 0, yoyo: true, repeat: -1, delay: 0.1});
+            TweenMax.to(lightA_1, 0.4,{alpha: 0, yoyo: true, repeat: -1, delay: 0.2});
+            TweenMax.to(lightA_3.scale, 0.4,{x: 0.1, yoyo: true, repeat: -1});
+            TweenMax.to(lightA_2.scale, 0.4,{x: 0.1, yoyo: true, repeat: -1, delay: 0.1});
+            TweenMax.to(lightA_1.scale, 0.4,{x: 0.1, yoyo: true, repeat: -1, delay: 0.2});
+        }
+        function ligthAminiplayerAUp() {
+            TweenMax.to(lightA, 0.2,{alpha: 0});
+            TweenMax.to(lightA_3, 0.1,{x: 0, y: -2, alpha: 1});
+            TweenMax.to(lightA_2, 0.1,{x: 0,y: -2, alpha: 1});
+            TweenMax.to(lightA_1, 0.1,{x: 0,y: -2, alpha: 1});
+            TweenMax.to(lightA_3.scale, 0.1,{x: 1.6});
+            TweenMax.to(lightA_2.scale, 0.1,{x: 0.8});
+            TweenMax.to(lightA_1.scale, 0.1,{x: 0.5});
+        }
+
+        function ligthAminiplayerB(idx) {
+            TweenMax.to(lightB, 0.5,{alpha: 1});
+            TweenMax.to(lightB_3, 0.5,{x: 1 * idx, y: 5});
+            TweenMax.to(lightB_2, 0.5,{x: 3 * idx, y: 20, delay: 0.05});
+            TweenMax.to(lightB_1, 0.5,{x: 7 * idx, y: 30, delay: 0.1});
+            TweenMax.to(lightB_3, 0.4,{alpha: 0, yoyo: true, repeat: -1});
+            TweenMax.to(lightB_2, 0.4,{alpha: 0, yoyo: true, repeat: -1, delay: 0.1});
+            TweenMax.to(lightB_1, 0.4,{alpha: 0, yoyo: true, repeat: -1, delay: 0.2});
+            TweenMax.to(lightB_3.scale, 0.4,{x: 0.1, yoyo: true, repeat: -1});
+            TweenMax.to(lightB_2.scale, 0.4,{x: 0.1, yoyo: true, repeat: -1, delay: 0.1});
+            TweenMax.to(lightB_1.scale, 0.4,{x: 0.1, yoyo: true, repeat: -1, delay: 0.2});
+        }
+        function ligthAminiplayerBUp() {
+            TweenMax.to(lightB, 0.2,{alpha: 0});
+            TweenMax.to(lightB_3, 0.1,{x: 0, y: -2, alpha: 1});
+            TweenMax.to(lightB_2, 0.1,{x: 0,y: -2, alpha: 1});
+            TweenMax.to(lightB_1, 0.1,{x: 0,y: -2, alpha: 1});
+            TweenMax.to(lightB_3.scale, 0.1,{x: 1.6});
+            TweenMax.to(lightB_2.scale, 0.1,{x: 0.8});
+            TweenMax.to(lightB_1.scale, 0.1,{x: 0.5});
         }
 
         // 遊戲進行
