@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1,maximum-scale=1,initial-scale=1,user-scalable=no" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script defer src="https://use.fontawesome.com/releases/v5.5.0/js/all.js" integrity="sha384-GqVMZRt5Gn7tB9D9q7ONtcp4gtHIUEW/yG7h98J7IpE3kpi+srfFyyB/04OV6pG0" crossorigin="anonymous"></script>
+    <title>Document</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        html, body{
+            width: 100%;
+            height: 100%;
+            background-color: #ccc;
+            user-select: none;
+        }
+        #app{
+            width: 100%;
+            height: 100%;
+            max-width: 667px;
+            max-height: 375px;
+            background-color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .posBox{
+            width: 30%;
+            display: flex;
+            align-items: center;
+            margin-left: 30px;
+        }
+        a{
+            cursor: pointer;
+        }
+        a.btn{
+            display: block;
+            width: 65px;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 60px;
+        }
+        a.right{
+            margin-right: 0px;
+        }
+        a.btn2{
+            display: block;
+            width: 136px;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="posBox">
+            <a class="btn left" id="left" ontouchstart="javascript:sentAction('left_down');" ontouchend="javascript:sentAction('left_up');"><i class="fas fa-angle-left fa-10x"></i></a>
+            <a class="btn right" id="right" ontouchstart="javascript:sentAction('right_down');" ontouchend="javascript:sentAction('right_up');"><i class="fas fa-angle-right fa-10x"></i></a>
+        </div>
+        <a class="btn2 jump" id="jump" ontouchstart="javascript:sentAction('jump_down');" ontouchend="javascript:sentAction('jump_up');"><i class="fas fa-arrow-up fa-10x"></i></a>
+    </div>
+</body>
+    <script type = "text/javascript">
+
+    document.addEventListener('touchstart',function (event) { 
+      if(event.touches.length>1){ 
+        event.preventDefault(); 
+      } 
+    }) 
+    var lastTouchEnd=0; 
+    document.addEventListener('touchend',function (event) { 
+      var now=(new Date()).getTime(); 
+      if(now-lastTouchEnd<=300){ 
+        event.preventDefault(); 
+      } 
+      lastTouchEnd=now; 
+    },false) 
+
+    var ws;
+        function WebSocketTest() {
+
+            if ("WebSocket" in window) {
+                // alert("WebSocket is supported by your Browser!");
+
+                // Let us open a web socket
+                ws = new WebSocket("ws://172.20.10.4:8000/ws");
+                // ws = new WebSocket("ws://127.0.0.1:8000/ws");
+
+                ws.onopen = function() {
+                    console.log("Connection is connected...");
+                    sentLogin('Harland');
+                };
+
+                ws.onmessage = function (evt) {
+                    var received_msg = evt.data;
+
+                };
+
+                ws.onclose = function() {
+                    console.log("Connection is closed...");
+                };
+            } else {
+
+                // The browser doesn't support WebSocket
+                alert("WebSocket NOT supported by your Browser!");
+            }
+        }
+
+        function sentAction(val){
+            var action = {"data":val}; // right left jump
+            ws.send(JSON.stringify({
+                type: "action",
+                channel: "1",
+                message: JSON.stringify(action) // Strip out html
+            }));
+        }
+
+        function sentLogin(val){
+            var action = {"data":val}; // right left jump
+            ws.send(JSON.stringify({
+                type: "login",
+                channel: "1",
+                message: JSON.stringify(action) // Strip out html
+            }));
+        }
+
+        WebSocketTest();
+    </script>
+</html>
