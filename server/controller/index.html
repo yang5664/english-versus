@@ -101,13 +101,13 @@
 <body>
     <div id="app">
         <div class="posBox">
-            <a class="btn left" id="left" ontouchstart="javascript:sentAction('left_down');" ontouchend="javascript:sentAction('left_up');"> </a>
-            <a class="btn right" id="right" ontouchstart="javascript:sentAction('right_down');" ontouchend="javascript:sentAction('right_up');"></a>
+            <a class="btn left" id="left" ontouchstart="javascript:sentAction('left_down');this.classList.add('open');" ontouchend="javascript:sentAction('left_up');this.classList.remove('open');"> </a>
+            <a class="btn right" id="right" ontouchstart="javascript:sentAction('right_down');this.classList.add('open');" ontouchend="javascript:sentAction('right_up');this.classList.remove('open');"></a>
         </div>
         <!-- user1 user2 -->
-        <div class="player "></div>
+        <div class="player " id="playerImage"></div>
 
-        <a class="btn2 jump" id="jump" ontouchstart="javascript:sentAction('jump_down');" ontouchend="javascript:sentAction('jump_up');"></a>
+        <a class="btn2 jump" id="jump" ontouchstart="javascript:sentAction('jump_down');this.classList.add('open');" ontouchend="javascript:sentAction('jump_up');this.classList.remove('open');"></a>
     </div>
 </body>
     <script type = "text/javascript">
@@ -172,6 +172,9 @@
                     var obj = JSON.parse(received_msg);
                     if(obj.type == 'join') {
                         playerNo = obj.message;
+
+                        var playerImage = document.getElementById("playerImage");
+                        playerImage.classList.add("user"+playerNo);
                     }
 
                 };
