@@ -133,7 +133,7 @@
             state, letters, wordList, correctLetter, randLetters, dropLetter,
             gameSceneBegin, gameScene, gameSceneOver, welcomeContainer, id,
             timerInterval, letterDropInterval, Starbg1,
-            timer = 5, bg,
+            timer = 500, bg,
             lightA, lightA_1, lightA_2, lightA_3, isPositionIdx = 1,
             lightB, lightB_1, lightB_2, lightB_3
 
@@ -213,7 +213,7 @@
                 PIXI.Texture.fromFrame("button-start/start-2.png"),
             ];
             buttonPlay = new PIXI.extras.AnimatedSprite(PlayButtonFF);
-            buttonPlay.x = 640;
+            buttonPlay.x = app.stage.width / 2 - 150;
             buttonPlay.y = 550;
             buttonPlay.interactive = true;
             buttonPlay.buttonMode = true;
@@ -231,10 +231,9 @@
             welcomeContainer.addChild(buttonPlay)
             // logo
             let logo = new Sprite(id[`logo.png`]);
-            logo.x = 500;
+            logo.x = app.stage.width / 2 - 300;
             logo.y = 270;
             welcomeContainer.addChild(logo);
-
             gameSceneBegin.addChild(welcomeContainer);
 
             /*
@@ -250,7 +249,7 @@
             gameScene.addChild(timerBoard);
             // 倒數計時板
             downCountBoard = new Container();
-            downCountBoard.x = 300;
+            downCountBoard.x = app.stage.width / 2;
             downCountBoard.y = 300;
             gameScene.addChild(downCountBoard);
             // 目前字母
@@ -259,6 +258,7 @@
             currentWordBoard.x = app.stage.width / 2 - 90;
             currentWordBoard.y = 20;
             gameScene.addChild(currentWordBoard);
+            //
 
 
             // 玩家A
@@ -268,6 +268,7 @@
                 PIXI.Texture.fromFrame("alien1/alien1-3.png")
             ];
             playerA = new PIXI.extras.AnimatedSprite(PlayerAfF);
+            playerA.id = 'A';
             playerA.alpha = 0;
             playerA.animationSpeed = 0.5;
             playerA.x = 200;
@@ -283,6 +284,14 @@
             playerA.board.x = 200;
             playerA.board.y = 100;
             gameScene.addChild(playerA.board);
+            // 底板
+            let wordHolderBoardA = new Sprite(id[`ui/blue_ui.png`]);
+            wordHolderBoardA.scale.x = 1.8;
+            wordHolderBoardA.scale.y = 1.5;
+            wordHolderBoardA.x = 0;
+            wordHolderBoardA.y = -50;
+            playerA.wordHolderBoard = wordHolderBoardA;
+            gameScene.addChild(playerA.wordHolderBoard);
 
             lightA = new Container();
             lightA_1 = new Sprite(id[`light-1.png`]);
@@ -310,6 +319,7 @@
                 PIXI.Texture.fromFrame("alien2/alien2-3.png")
             ];
             playerB = new PIXI.extras.AnimatedSprite(PlayerBfF);
+            playerB.id = 'B';
             playerB.alpha = 0;
             playerB.animationSpeed = 0.5;
             playerB.x = app.stage.width - 200;
@@ -319,14 +329,20 @@
             playerB.collect = []; // 目前蒐集的字母
             playerB.doneList = []; // 完成的單字
             playerB.play();
-
             gameScene.addChild(playerB);
-
+            // 字母蒐集板
             playerB.board = new Container();
             playerB.board.x = app.stage.width - 350;
             playerB.board.y = 100;
             gameScene.addChild(playerB.board);
-
+            // 底板
+            let wordHolderBoardB = new Sprite(id[`ui/red_ui.png`]);
+            wordHolderBoardB.scale.x = 1.8;
+            wordHolderBoardB.scale.y = 1.5;
+            wordHolderBoardB.x = app.stage.width - wordHolderBoardB.width;
+            wordHolderBoardB.y = -50;
+            playerB.wordHolderBoard = wordHolderBoardB;
+            gameScene.addChild(playerB.wordHolderBoard);
 
             lightB = new Container();
             lightB_1 = new Sprite(id[`light-2.png`]);
@@ -675,8 +691,15 @@
             player.board.removeChildren(0, 3);
             player.collect.forEach(function(letter, idx) {
                 let _letter = new Sprite(id[`font/${letter}.png`]);
-                _letter.x = idx * 50;
-                _letter.y = 0;
+                if (player.id == 'A') {
+                    _letter.x = (idx * 50) - 145;
+                    _letter.y = 15;
+                } else {
+                    _letter.x = idx * 60 - 4;
+                    _letter.y = 15;
+                }
+                _letter.scale.x = 0.7;
+                _letter.scale.y = 0.7;
                 player.board.addChild(_letter);
             });
         }
