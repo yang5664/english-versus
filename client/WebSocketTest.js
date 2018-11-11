@@ -19,10 +19,6 @@ function WebSocketTest() {
             var obj = JSON.parse(received_msg);
             // console.log(obj);
 
-            ready();
-            playerA.alpha = 1;
-            playerB.alpha = 1;
-
             if(obj.type == 'playground') {
                 showPlayersQRCode(obj.playground_id);
             }
