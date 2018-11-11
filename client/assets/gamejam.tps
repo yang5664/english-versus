@@ -317,6 +317,27 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">GameJam/explosionFail/explosionFail-1.png</key>
+            <key type="filename">GameJam/explosionFail/explosionFail-2.png</key>
+            <key type="filename">GameJam/explosionFail/explosionFail-3.png</key>
+            <key type="filename">GameJam/explosionFail/explosionFail-4.png</key>
+            <key type="filename">GameJam/explosionFail/explosionFail-5.png</key>
+            <key type="filename">GameJam/explosionFail/explosionFail-6.png</key>
+            <key type="filename">GameJam/explosionFail/explosionFail-7.png</key>
+            <key type="filename">GameJam/explosionFail/explosionFail-8.png</key>
+            <key type="filename">GameJam/explosionFail/explosionFail.psd</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>36,36,72,72</rect>
+                <key>scale9Paddings</key>
+                <rect>36,36,72,72</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">GameJam/font/L.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
@@ -379,6 +400,39 @@
                 <rect>95,144,189,288</rect>
                 <key>scale9Paddings</key>
                 <rect>95,144,189,288</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">GameJam/ui/blue_ui.png</key>
+            <key type="filename">GameJam/ui/button_lift.png</key>
+            <key type="filename">GameJam/ui/button_lift_c.png</key>
+            <key type="filename">GameJam/ui/button_right.png</key>
+            <key type="filename">GameJam/ui/button_right_c.png</key>
+            <key type="filename">GameJam/ui/button_up.png</key>
+            <key type="filename">GameJam/ui/button_up_c.png</key>
+            <key type="filename">GameJam/ui/red_ui.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>59,59,117,117</rect>
+                <key>scale9Paddings</key>
+                <rect>59,59,117,117</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">GameJam/ui/win.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>65,43,129,86</rect>
+                <key>scale9Paddings</key>
+                <rect>65,43,129,86</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
