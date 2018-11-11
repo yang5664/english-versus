@@ -378,6 +378,20 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">GameJam/replay/button-replay-1.png</key>
+            <key type="filename">GameJam/replay/button-replay-2.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>57,20,114,40</rect>
+                <key>scale9Paddings</key>
+                <rect>57,20,114,40</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
             <key type="filename">GameJam/star/star1.png</key>
             <key type="filename">GameJam/star/star10.png</key>
             <key type="filename">GameJam/star/star11.png</key>
@@ -420,6 +434,19 @@
                 <rect>59,59,117,117</rect>
                 <key>scale9Paddings</key>
                 <rect>59,59,117,117</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">GameJam/ui/deuce.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>74,35,148,70</rect>
+                <key>scale9Paddings</key>
+                <rect>74,35,148,70</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
