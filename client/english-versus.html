@@ -12,6 +12,10 @@
         margin: 0;
         box-sizing: border-box;
     }
+    @font-face {
+        font-family: "bit8";
+        src: url("./font/BitPotionExt.ttf");
+    }
     html, body{
         width: 100%;
         height: 100%;
@@ -20,8 +24,33 @@
         align-items: center;
         background-color: #000;
     }
+    .loading{
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        z-index: 999;
+        top: 0;
+        left: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .loading > h1{
+        font-size: 90px;
+        color: #fff;
+        font-family: "bit8";
+        letter-spacing: 10px;
+    }
+
 </style>
 <body>
+    <div class="loading">
+        <h1>Loading...</h1>
+    </div>
+
+    <div id="app"></div>
+
     <script src="https://code.createjs.com/1.0.0/soundjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.3/TweenMax.min.js"></script>
     <script src="./WebSocketTest.js"></script>
@@ -48,15 +77,28 @@
             antialiasing: true,
             transparent: false,
             resolution: 1
-        }
-        );
+        });
+        document.getElementById("app").appendChild(app.view);
 
-        document.body.appendChild(app.view);
+        let loadint = 0;	//目前載入進度
 
-        loader
-        .add("assets/gamejam.json")
-        .load(setup);
-
+        const sounds = [
+            {src:"./sound/bg-play.mp3", id:"bg-play"},
+            {src:"./sound/bg-start.mp3", id:"bg-start"},
+            {src:"./sound/boom.mp3", id:"boom"},
+            {src:"./sound/coin.mp3", id:"coin"},
+            {src:"./sound/play.mp3", id:"play"},
+        ];
+        createjs.Sound.alternateExtensions = ["mp3"];
+        createjs.Sound.addEventListener("fileload", (e)=>{
+            loadint++
+            if(loadint === sounds.length){
+                loader.add("assets/gamejam.json").load(setup);
+                bgAudio = createjs.Sound.play("bg-play", {loop:-1});
+                bgAudio.volume = 0.1;
+            }
+        });
+        createjs.Sound.registerSounds(sounds, "./");
 
         // 建立遊戲物件
         let playerA, playerB, isJumpA, isJumpB, playerA_vy = 0, playerB_vy = 0,
@@ -89,6 +131,8 @@
 
         // 遊戲配置
         function setup() {
+            //素材載入完成
+            document.querySelector(".loading").style.display = 'none';
             id = resources["assets/gamejam.json"].textures;
 
             /*
@@ -142,7 +186,7 @@
             app.stage.addChild(gameScene);
             gameScene.visible = true;
             // 計時板
-            timerBoard = new PIXI.Text(60, fontStyle);
+            timerBoard = new PIXI.Text(timer, fontStyle);
             timerBoard.x = 20;
             timerBoard.y = 0;
             gameScene.addChild(timerBoard);
@@ -181,12 +225,12 @@
             lightA_3 = new Sprite(id[`light-1.png`]);
 
             lightA.addChild(lightA_1);
+            lightA.addChild(lightA_2);
+            lightA.addChild(lightA_3);
             lightA_1.scale.x = 0.5;
             lightA_1.anchor.x = 0.5;
-            lightA.addChild(lightA_2);
             lightA_2.scale.x = 0.8;
             lightA_2.anchor.x = 0.5;
-            lightA.addChild(lightA_3);
             lightA_3.scale.x = 1.6;
             lightA_3.anchor.x = 0.5;
             playerA.addChild(lightA);
@@ -223,12 +267,12 @@
             lightB_2 = new Sprite(id[`light-2.png`]);
             lightB_3 = new Sprite(id[`light-2.png`]);
             lightB.addChild(lightB_1);
+            lightB.addChild(lightB_2);
+            lightB.addChild(lightB_3);
             lightB_1.scale.x = 0.5;
             lightB_1.anchor.x = 0.5;
-            lightB.addChild(lightB_2);
             lightB_2.scale.x = 0.8;
             lightB_2.anchor.x = 0.5;
-            lightB.addChild(lightB_3);
             lightB_3.scale.x = 1.6;
             lightB_3.anchor.x = 0.5;
             playerB.addChild(lightB);
@@ -354,7 +398,6 @@
                 timer--;
                 if (timer<=0) state = end;
                 timerBoard.setText(timer);
-
             }, 1000);
             
             letterDropInterval = setInterval(function(){
@@ -374,22 +417,10 @@
                         y: 1300,
                         onUpdate: ()=>{
                             if (hitTestRectangle(playerA, dropLetter)) {
-                                BombEf(dropLetter.x, dropLetter.y);
-                                dropLetter.y = dropLetter.y - 50
-                                tm.kill({y:true}, dropLetter);
-                                gameScene.removeChild(dropLetter);
-                                // 檢查玩家拼字
-                                playerA.collect.push(letter);
-                                checkPlayerWord(playerA);
+                                hitTestOverFn(tm, playerA, dropLetter);
                             }
                             if (hitTestRectangle(playerB, dropLetter)) {
-                                BombEf(dropLetter.x, dropLetter.y);
-                                dropLetter.y = dropLetter.y - 50
-                                tm.kill({y:true}, dropLetter);
-                                gameScene.removeChild(dropLetter);
-                                // 檢查玩家拼字
-                                playerB.collect.push(letter);
-                                checkPlayerWord(playerB);
+                                hitTestOverFn(tm, playerB, dropLetter);
                             }
                         },
                         onComplete: ()=> {
@@ -398,6 +429,16 @@
                     }
                 );
             }, 900);
+        }
+
+        function hitTestOverFn(tm, player, dropLetter){
+            createjs.Sound.play("coin");
+            BombEf(dropLetter.x, dropLetter.y);
+            dropLetter.y = dropLetter.y - 50
+            tm.kill({y:true}, dropLetter);
+            gameScene.removeChild(dropLetter);
+            player.collect.push(letter);
+            checkPlayerWord(player);
         }
 
         function BombEf(x, y) {
@@ -427,49 +468,47 @@
                 gameScene.removeChild(Bomb1);
             };
         }
-
         function ligthAminiplayerA(idx) {
-            TweenMax.to(lightA, 0.5,{alpha: 1});
-            TweenMax.to(lightA_3, 0.5,{x: 1 * idx, y: 5});
-            TweenMax.to(lightA_2, 0.5,{x: 3 * idx, y: 20, delay: 0.05});
-            TweenMax.to(lightA_1, 0.5,{x: 7 * idx, y: 30, delay: 0.1});
-            TweenMax.to(lightA_3, 0.4,{alpha: 0, yoyo: true, repeat: -1});
-            TweenMax.to(lightA_2, 0.4,{alpha: 0, yoyo: true, repeat: -1, delay: 0.1});
-            TweenMax.to(lightA_1, 0.4,{alpha: 0, yoyo: true, repeat: -1, delay: 0.2});
-            TweenMax.to(lightA_3.scale, 0.4,{x: 0.1, yoyo: true, repeat: -1});
-            TweenMax.to(lightA_2.scale, 0.4,{x: 0.1, yoyo: true, repeat: -1, delay: 0.1});
-            TweenMax.to(lightA_1.scale, 0.4,{x: 0.1, yoyo: true, repeat: -1, delay: 0.2});
+            TweenMax.to(lightA, 0.4,{alpha: 1});
+            TweenMax.to(lightA_3, 0.3,{x: 1 * idx, y: 5});
+            TweenMax.to(lightA_2, 0.3,{x: 3 * idx, y: 20, delay: 0.05});
+            TweenMax.to(lightA_1, 0.3,{x: 7 * idx, y: 30, delay: 0.1});
+            TweenMax.to(lightA_3, 0.3,{alpha: 0, yoyo: true, repeat: -1});
+            TweenMax.to(lightA_2, 0.3,{alpha: 0, yoyo: true, repeat: -1, delay: 0.1});
+            TweenMax.to(lightA_1, 0.3,{alpha: 0, yoyo: true, repeat: -1, delay: 0.2});
+            TweenMax.to(lightA_3.scale, 0.3,{x: 0.1, yoyo: true, repeat: -1});
+            TweenMax.to(lightA_2.scale, 0.3,{x: 0.1, yoyo: true, repeat: -1, delay: 0.1});
+            TweenMax.to(lightA_1.scale, 0.3,{x: 0.1, yoyo: true, repeat: -1, delay: 0.2});
+        }
+        function ligthAminiplayerB(idx) {
+            TweenMax.to(lightB, 0.4,{alpha: 1});
+            TweenMax.to(lightB_3, 0.3,{x: 1 * idx, y: 5});
+            TweenMax.to(lightB_2, 0.3,{x: 3 * idx, y: 20, delay: 0.05});
+            TweenMax.to(lightB_1, 0.3,{x: 7 * idx, y: 30, delay: 0.1});
+            TweenMax.to(lightB_3, 0.3,{alpha: 0, yoyo: true, repeat: -1});
+            TweenMax.to(lightB_2, 0.3,{alpha: 0, yoyo: true, repeat: -1, delay: 0.1});
+            TweenMax.to(lightB_1, 0.3,{alpha: 0, yoyo: true, repeat: -1, delay: 0.2});
+            TweenMax.to(lightB_3.scale, 0.3,{x: 0.1, yoyo: true, repeat: -1});
+            TweenMax.to(lightB_2.scale, 0.3,{x: 0.1, yoyo: true, repeat: -1, delay: 0.1});
+            TweenMax.to(lightB_1.scale, 0.3,{x: 0.1, yoyo: true, repeat: -1, delay: 0.2});
         }
         function ligthAminiplayerAUp() {
-            TweenMax.to(lightA, 0.2,{alpha: 0});
+            TweenMax.to(lightA, 0.1,{alpha: 0});
             TweenMax.to(lightA_3, 0.1,{x: 0, y: -2, alpha: 1});
             TweenMax.to(lightA_2, 0.1,{x: 0,y: -2, alpha: 1});
             TweenMax.to(lightA_1, 0.1,{x: 0,y: -2, alpha: 1});
             TweenMax.to(lightA_3.scale, 0.1,{x: 1.6});
-            TweenMax.to(lightA_2.scale, 0.1,{x: 0.8});
-            TweenMax.to(lightA_1.scale, 0.1,{x: 0.5});
-        }
-
-        function ligthAminiplayerB(idx) {
-            TweenMax.to(lightB, 0.5,{alpha: 1});
-            TweenMax.to(lightB_3, 0.5,{x: 1 * idx, y: 5});
-            TweenMax.to(lightB_2, 0.5,{x: 3 * idx, y: 20, delay: 0.05});
-            TweenMax.to(lightB_1, 0.5,{x: 7 * idx, y: 30, delay: 0.1});
-            TweenMax.to(lightB_3, 0.4,{alpha: 0, yoyo: true, repeat: -1});
-            TweenMax.to(lightB_2, 0.4,{alpha: 0, yoyo: true, repeat: -1, delay: 0.1});
-            TweenMax.to(lightB_1, 0.4,{alpha: 0, yoyo: true, repeat: -1, delay: 0.2});
-            TweenMax.to(lightB_3.scale, 0.4,{x: 0.1, yoyo: true, repeat: -1});
-            TweenMax.to(lightB_2.scale, 0.4,{x: 0.1, yoyo: true, repeat: -1, delay: 0.1});
-            TweenMax.to(lightB_1.scale, 0.4,{x: 0.1, yoyo: true, repeat: -1, delay: 0.2});
+            TweenMax.to(lightA_2.scale, 0.1,{x: 0.8, y: 0.5});
+            TweenMax.to(lightA_1.scale, 0.1,{x: 0.5, y: 0.3});
         }
         function ligthAminiplayerBUp() {
-            TweenMax.to(lightB, 0.2,{alpha: 0});
+            TweenMax.to(lightB, 0.1,{alpha: 0});
             TweenMax.to(lightB_3, 0.1,{x: 0, y: -2, alpha: 1});
             TweenMax.to(lightB_2, 0.1,{x: 0,y: -2, alpha: 1});
             TweenMax.to(lightB_1, 0.1,{x: 0,y: -2, alpha: 1});
             TweenMax.to(lightB_3.scale, 0.1,{x: 1.6});
-            TweenMax.to(lightB_2.scale, 0.1,{x: 0.8});
-            TweenMax.to(lightB_1.scale, 0.1,{x: 0.5});
+            TweenMax.to(lightB_2.scale, 0.1,{x: 0.8, y: 0.5});
+            TweenMax.to(lightB_1.scale, 0.1,{x: 0.5, y: 0.3});
         }
 
         // 遊戲進行
