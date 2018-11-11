@@ -132,7 +132,7 @@
             state, letters, wordList, correctLetter, randLetters, dropLetter,
             gameSceneBegin, gameScene, gameSceneOver, welcomeContainer, id,
             timerInterval, letterDropInterval, Starbg1,
-            timer = 500, bg,
+            timer = 3, bg,
             lightA, lightA_1, lightA_2, lightA_3, isPositionIdx = 1,
             lightB, lightB_1, lightB_2, lightB_3,
             playerDel,logo, winlogo, playerDelEf, deuce;
@@ -509,6 +509,7 @@
         }
         //輸的玩家
         function playerDelLost(player) {
+            createjs.Sound.play("boom");
             playerDel.x = player.x;
             playerDel.y = player.y;
             playerDel.play();
@@ -782,10 +783,12 @@
             randLetters = [...randLetters, ...correctLetter];
             // 
         }
-
+        
+        let isOver = true;
         // 遊戲結束
         function gameover() {
-
+            if(!isOver) return ;
+            isOver = false;
             if (playerA.doneList.length > playerB.doneList.length) {
                 // A 獲勝
                 playerDelLost(playerB);
