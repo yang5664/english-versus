@@ -54,11 +54,18 @@
         justify-content: center;
         align-items: center;
     }
-    #p1, #p2{
+    #p1{
         width: 350px;
         height: 350px;
     }
-
+    canvas {
+        transform: scale(1);
+    }
+    @media screen and (max-width: 1600px) {
+        canvas {
+            transform: scale(0.7);
+        }
+    }
 </style>
 <body>
     <div class="loading">
