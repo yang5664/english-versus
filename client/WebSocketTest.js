@@ -21,10 +21,8 @@ function WebSocketTest() {
 
             if(obj.type == 'playground') {
                 showPlayersQRCode(obj.playground_id);
-                playerA.alpha = 1;
-                playerB.alpha = 1;
-                ready();
             }
+            
             if(obj.type == 'join') {
                 if (obj.message == "1") {
                     playerA.alpha = 1;

@@ -258,8 +258,8 @@
             // 計時板
             // timerBoard = new PIXI.Text('', fontStyle);
             timerBoard = new Container();
-            timerBoard.x = 20;
-            timerBoard.y = 0;
+            timerBoard.x = 100;
+            timerBoard.y = 60;
             gameScene.addChild(timerBoard);
             // 倒數計時板
             downCountBoard = new Container();
@@ -544,7 +544,7 @@
                     start();
                     clearInterval(readyInterval);
                 }
-                num2Pic(downCountBoard, downcount);
+                num2Pic(downCountBoard, downcount, 5, 5);
             }, 1000);
         }
 
@@ -906,10 +906,15 @@
         };
 
         // 數字轉換圖片
-        function num2Pic(container, num) {
+        function num2Pic(container, num, xScale, yScale) {
+
+            if (xScale == undefined) xScale = 1.5;
+            if (yScale == undefined) yScale = 1.5;
             container.removeChildren(0, 3);
+            
             num.toString().split('').forEach(function(num, idx) {
                 let _num = new Sprite(id[`Number/${num}.png`]);
+                _num.anchor.set(0.5);
                 _num.x = idx * 50;
                 _num.y = 0;
                 container.addChild(_num);
@@ -923,7 +928,7 @@
 
                 */
                 TweenMax.to(_num.scale, 0.7,{
-                    x: 1, y: 1.5,
+                    x: xScale, y: yScale,
                     yoyo: false, repeat: -1
                 });
 
