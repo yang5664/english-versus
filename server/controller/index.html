@@ -19,6 +19,10 @@
             user-select: none;
         }
         #app{
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
             width: 100%;
             height: 100%;
             max-width: 667px;
@@ -37,39 +41,99 @@
         a{
             cursor: pointer;
         }
-        a.btn{
+        a.btn.left{
             display: block;
-            width: 65px;
-            height: 180px;
+            width: 120px;
+            height: 120px;
+            background-image: url("./images/button_lift.png");
+            background-size: 250%;
+            background-position: center;
+
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-right: 60px;
         }
-        a.right{
-            margin-right: 0px;
+        a.btn.left.open{
+            background-image: url("./images/button_lift_c.png");
         }
-        a.btn2{
+        a.btn.right{
             display: block;
-            width: 136px;
-            height: 180px;
+            width: 120px;
+            height: 120px;
+            background-image: url("./images/button_right.png");
+            background-size: 250%;
+            background-position: center;
+
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-right: 30px;
+        }
+        a.btn.right.open{
+            background-image: url("./images/button_right_c.png");
+        }
+        a.btn2.jump{
+            display: block;
+            width: 120px;
+            height: 120px;
+            background-image: url("./images/button_up.png");
+            background-size: 200%;
+            background-position: center;
+            margin-right: 50px;
+        }
+        a.btn2.jump.open{
+            background-image: url("./images/button_up_c.png");
+        }
+        .player{
+            width: 200px;
+            height: 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 70% auto;
+        }
+        .player.user1{
+            background-image: url("./images/alien1-1.png")
+        }
+        .player.user2{
+            background-image: url("./images/alien2-1.png")
         }
     </style>
 </head>
 <body>
     <div id="app">
         <div class="posBox">
-            <a class="btn left" id="left" ontouchstart="javascript:sentAction('left_down');" ontouchend="javascript:sentAction('left_up');"><i class="fas fa-angle-left fa-10x"></i></a>
-            <a class="btn right" id="right" ontouchstart="javascript:sentAction('right_down');" ontouchend="javascript:sentAction('right_up');"><i class="fas fa-angle-right fa-10x"></i></a>
+            <a class="btn left" id="left" ontouchstart="javascript:sentAction('left_down');" ontouchend="javascript:sentAction('left_up');"> </a>
+            <a class="btn right" id="right" ontouchstart="javascript:sentAction('right_down');" ontouchend="javascript:sentAction('right_up');"></a>
         </div>
-        <a class="btn2 jump" id="jump" ontouchstart="javascript:sentAction('jump_down');" ontouchend="javascript:sentAction('jump_up');"><i class="fas fa-arrow-up fa-10x"></i></a>
+        <!-- user1 user2 -->
+        <div class="player "></div>
+
+        <a class="btn2 jump" id="jump" ontouchstart="javascript:sentAction('jump_down');" ontouchend="javascript:sentAction('jump_up');"></a>
     </div>
 </body>
     <script type = "text/javascript">
+
+    let leftBtn = document.querySelector(".left");
+    let rightBtn = document.querySelector(".right");
+    let JumpBtn = document.querySelector(".jump");
+    leftBtn.addEventListener("mousedown", function () {
+        leftBtn.classList.add("open");
+    })
+    leftBtn.addEventListener("mouseup", function () {
+        leftBtn.classList.remove("open");
+    })
+    rightBtn.addEventListener("mousedown", function () {
+        rightBtn.classList.add("open");
+    })
+    rightBtn.addEventListener("mouseup", function () {
+        rightBtn.classList.remove("open");
+    })
+    JumpBtn.addEventListener("mousedown", function () {
+        JumpBtn.classList.add("open");
+    })
+    JumpBtn.addEventListener("mouseup", function () {
+        JumpBtn.classList.remove("open");
+    })
+
 
     document.addEventListener('touchstart',function (event) { 
       if(event.touches.length>1){ 
