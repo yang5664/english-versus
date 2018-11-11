@@ -183,6 +183,7 @@
         <map type="IndividualSpriteSettingsMap">
             <key type="filename">GameJam/Number/0.png</key>
             <key type="filename">GameJam/Number/1.png</key>
+            <key type="filename">GameJam/Number/2.png</key>
             <key type="filename">GameJam/Number/3.png</key>
             <key type="filename">GameJam/Number/4.png</key>
             <key type="filename">GameJam/Number/6.png</key>
