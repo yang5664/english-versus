@@ -42,12 +42,35 @@
         font-family: "bit8";
         letter-spacing: 10px;
     }
+    .qrcode{
+        display: noen;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(1,1,1, 0.1);
+        z-index: 999;
+        top: 0;
+        left: 0;
+        display: none;
+        justify-content: space-around;
+        align-items: center;
+    }
+    #p1, #p2{
+        width: 350px;
+        height: 350px;
+    }
 
 </style>
 <body>
     <div class="loading">
         <h1>Loading...</h1>
     </div>
+
+    <div class="qrcode">
+        <div id="p1"></div>
+        <div id="p2"></div>
+    </div>
+
 
     <div id="app"></div>
 
@@ -95,7 +118,9 @@
         createjs.Sound.addEventListener("fileload", (e)=>{
             loadint++
             if(loadint === sounds.length){
-                loader.add("assets/gamejam.json").load(setup);
+                loader
+                    .add("assets/gamejam.json")
+                    .load(setup);
                 bgAudio = createjs.Sound.play("bg-play", {loop:-1});
                 bgAudio.volume = 0.1;
             }
@@ -107,7 +132,7 @@
             leftA, rightA, jumpA, leftB, rightB, jumpB,
             timerBoard, currentWordBoard,
             state, letters, wordList, correctLetter, randLetters, dropLetter,
-            gameSceneBegin, gameScene, gameSceneOver, id,
+            gameSceneBegin, gameScene, gameSceneOver, welcomeContainer, id,
             timerInterval, letterDropInterval, Starbg1,
             timer = 600,
             lightA, lightA_1, lightA_2, lightA_3, isPositionIdx = 1,
@@ -142,6 +167,7 @@
             */
             gameSceneBegin = new Container();
             app.stage.addChild(gameSceneBegin);
+            gameSceneBegin.visible = true;
 
             let bg = new Sprite(id["bg.PNG"]);
             gameSceneBegin.addChild(bg);
@@ -180,13 +206,27 @@
                     Starbg1.gotoAndPlay(0);
                 }, 1300);
             };
+            // 歡迎畫面
+            welcomeContainer = new Container();
+            var basicText = new PIXI.Text("Let's Play", fontStyle);
+            basicText.x = 500;
+            basicText.y = 200;
+            basicText.interactive = true;
+            basicText.buttonMode = true;
+            basicText.on('pointerdown', function(e){
+                document.querySelector(".qrcode").style.display = "flex";
+                welcomeContainer.visible = false;
+                // gameScene.visible = true;
+            });
+            welcomeContainer.addChild(basicText)
+            gameSceneBegin.addChild(welcomeContainer);
 
             /*
             * 遊戲畫面
             */
             gameScene = new Container();
             app.stage.addChild(gameScene);
-            gameScene.visible = true;
+            gameScene.visible = false;
             // 計時板
             timerBoard = new PIXI.Text(timer, fontStyle);
             timerBoard.x = 20;
@@ -194,7 +234,7 @@
             gameScene.addChild(timerBoard);
             // 目前字母
             currentWordBoard = new Container();
-            currentWordBoard.x = app.stage.width / 2 - 100;
+            currentWordBoard.x = app.stage.width / 2 - 90;
             currentWordBoard.y = 20;
             gameScene.addChild(currentWordBoard);
 
@@ -393,6 +433,11 @@
             start();
         }
 
+        // 遊戲預備
+        function ready() {
+            
+        }
+
         // 遊戲循環
         function gameLoop(delta) {
             state(delta);
@@ -415,6 +460,7 @@
                 // dropLetter.anchor.set(0.5);
                 // 加到遊戲場景
                 gameScene.addChild(dropLetter);
+                dropLetter.letter = letter;
                 dropLetter.x = Math.floor(Math.random() * (gameScene.width - 50 + 1) + 50);
                 dropLetter.y = -20;
 
@@ -443,7 +489,7 @@
             dropLetter.y = dropLetter.y - 50
             tm.kill({y:true}, dropLetter);
             gameScene.removeChild(dropLetter);
-            player.collect.push(letter);
+            player.collect.push(dropLetter.letter);
             checkPlayerWord(player);
         }
 
