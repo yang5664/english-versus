@@ -88,6 +88,8 @@
             {src:"./sound/boom.mp3", id:"boom"},
             {src:"./sound/coin.mp3", id:"coin"},
             {src:"./sound/play.mp3", id:"play"},
+            {src:"./sound/Jump1.mp3", id:"Jump1"},
+            {src:"./sound/Jump2.mp3", id:"Jump2"},
         ];
         createjs.Sound.alternateExtensions = ["mp3"];
         createjs.Sound.addEventListener("fileload", (e)=>{
@@ -111,7 +113,7 @@
             lightA, lightA_1, lightA_2, lightA_3, isPositionIdx = 1,
             lightB, lightB_1, lightB_2, lightB_3
 
-        var fontStyle = new PIXI.TextStyle({
+        let fontStyle = new PIXI.TextStyle({
                 fontFamily: 'Arial',
                 fontSize: 60,
                 fontStyle: 'italic',
@@ -342,6 +344,8 @@
             }
             jumpA.press = function() {
                 isJumpA = true;
+                let j = createjs.Sound.play("Jump1");
+                j.volume = 0.1;
             }
             jumpA.release = function() {
                 isJumpA = false;
@@ -375,6 +379,8 @@
             }
             jumpB.press = function() {
                 isJumpB = true;
+                let j = createjs.Sound.play("Jump2");
+                j.volume = 0.1;
             }
             jumpB.release = function() {
                 isJumpB = false;
