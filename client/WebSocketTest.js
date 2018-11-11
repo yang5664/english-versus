@@ -22,26 +22,66 @@ function WebSocketTest() {
             if(obj.type == 'playground') {
                 showPlayersQRCode(obj.playground_id);
             }
+            if(obj.type == 'join') {
+                if (obj.message == "1") {
+                    playerA.alpha = 1;
+                } else {
+                    playerB.alpha = 1;
+                }
+
+                if (playerA.alpha && playerB.alpha) {
+                    ready();
+                }
+
+                playerA.alpha = 1;
+                playerB.alpha = 1;
+                ready();
+            }
+            
             if (obj.type == 'action'){
                 event = JSON.parse(obj.message);
                 switch (event.data) {
                     case 'left_up':
-                        leftA.release();
+                        if (event.no == '1') {
+                            leftA.release();
+                        } else {
+                            leftB.release();
+                        }
                     break;
                     case 'left_down':
-                        leftA.press();
+                        if (event.no == '1') {
+                            leftA.press();
+                        } else {
+                            leftB.press();
+                        }
                     break;
                     case 'right_up':
-                        rightA.release();
+                        if (event.no == '1') {
+                            rightA.release();
+                        } else {
+                            rightB.release();
+                        }
                     break;
                     case 'right_down':
-                        rightA.press();
+                        if (event.no == '1') {
+                            rightA.press();
+                        } else {
+                            rightB.press();
+                        }
                     break;
                     case 'jump_up':
-                        jumpA.release();
+                        if (event.no == '1') {
+                            jumpA.release();
+                        } else {
+                            jumpB.release();
+                        }
                     break;
                     case 'jump_down':
-                        jumpA.press();
+                        if (event.no == '1') {
+                            jumpA.press();
+                        } else {
+                            jumpB.press();
+                        }
                     break;
                 }
             }
@@ -74,11 +114,8 @@ function WebSocketTest() {
         // 顯示player登入的QRCode
         // src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=Hello%20world&choe=UTF-8"
         var p1 = document.getElementById("p1");
-        var url1 = encodeURIComponent("http://www.5floor.net/english-versus/index.html?player=1&playground_id=" + val);
+        var url1 = encodeURIComponent("http://www.5floor.net/english-versus/index.html?playground_id=" + val);
         p1.innerHTML = "<img src='https://chart.googleapis.com/chart?chs=350x350&amp;cht=qr&amp;chl="+url1+"&amp;choe=UTF-8' alt='QR code'>";
 
-        var p2 = document.getElementById("p2");
-        var url1 = encodeURIComponent("http://www.5floor.net/english-versus/index.html?player=2&playground_id=" + val);
-        p2.innerHTML = "<img src='https://chart.googleapis.com/chart?chs=350x350&amp;cht=qr&amp;chl="+url1+"&amp;choe=UTF-8' alt='QR code'>";
     }
 }

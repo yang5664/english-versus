@@ -52,7 +52,7 @@
         top: 0;
         left: 0;
         display: none;
-        justify-content: space-around;
+        justify-content: center;
         align-items: center;
     }
     #p1, #p2{
@@ -68,7 +68,6 @@
 
     <div class="qrcode">
         <div id="p1"></div>
-        <div id="p2"></div>
     </div>
 
 
@@ -130,11 +129,11 @@
         // 建立遊戲物件
         let playerA, playerB, isJumpA, isJumpB, playerA_vy = 0, playerB_vy = 0,
             leftA, rightA, jumpA, leftB, rightB, jumpB,
-            timerBoard, currentWordBoard,
+            timerBoard, downCountBoard, currentWordBoard,
             state, letters, wordList, correctLetter, randLetters, dropLetter,
             gameSceneBegin, gameScene, gameSceneOver, welcomeContainer, id,
             timerInterval, letterDropInterval, Starbg1,
-            timer = 600,
+            timer = 5, bg,
             lightA, lightA_1, lightA_2, lightA_3, isPositionIdx = 1,
             lightB, lightB_1, lightB_2, lightB_3
 
@@ -147,7 +146,7 @@
                 stroke: '#4a1850',
                 strokeThickness: 5,
                 dropShadow: true,
-                dropShadowColor: '#000000',
+                dropShadowColor: '#ffffff',
                 dropShadowBlur: 4,
                 dropShadowAngle: Math.PI / 6,
                 dropShadowDistance: 6,
@@ -169,12 +168,12 @@
             app.stage.addChild(gameSceneBegin);
             gameSceneBegin.visible = true;
 
-            let bg = new Sprite(id["bg.PNG"]);
+            bg = new Sprite(id["bg.PNG"]);
             gameSceneBegin.addChild(bg);
             bg.width = 1600;
             bg.height = 900;
 
-             // 流星
+             // 流星button-start/start-1.png
             let StarAf = [
                 PIXI.Texture.fromFrame("star/star1.png"),
                 PIXI.Texture.fromFrame("star/star2.png"),
@@ -208,17 +207,34 @@
             };
             // 歡迎畫面
             welcomeContainer = new Container();
-            var basicText = new PIXI.Text("Let's Play", fontStyle);
-            basicText.x = 500;
-            basicText.y = 200;
-            basicText.interactive = true;
-            basicText.buttonMode = true;
-            basicText.on('pointerdown', function(e){
+            //var buttonPlay = new PIXI.Text("Let's Play", fontStyle);
+            let PlayButtonFF = [
+                PIXI.Texture.fromFrame("button-start/start-1.png"),
+                PIXI.Texture.fromFrame("button-start/start-2.png"),
+            ];
+            buttonPlay = new PIXI.extras.AnimatedSprite(PlayButtonFF);
+            buttonPlay.x = 640;
+            buttonPlay.y = 550;
+            buttonPlay.interactive = true;
+            buttonPlay.buttonMode = true;
+            buttonPlay.on('mouseover', function(e){
+                buttonPlay.gotoAndStop(1);
+            });
+            buttonPlay.on('mouseout', function(e){
+                buttonPlay.gotoAndStop(0);
+            });
+            buttonPlay.on('pointerdown', function(e){
+                buttonPlay.gotoAndStop(1);
                 document.querySelector(".qrcode").style.display = "flex";
                 welcomeContainer.visible = false;
-                // gameScene.visible = true;
             });
-            welcomeContainer.addChild(basicText)
+            welcomeContainer.addChild(buttonPlay)
+            // logo
+            let logo = new Sprite(id[`logo.png`]);
+            logo.x = 500;
+            logo.y = 270;
+            welcomeContainer.addChild(logo);
+
             gameSceneBegin.addChild(welcomeContainer);
 
             /*
@@ -226,14 +242,20 @@
             */
             gameScene = new Container();
             app.stage.addChild(gameScene);
-            gameScene.visible = false;
             // 計時板
-            timerBoard = new PIXI.Text(timer, fontStyle);
+            // timerBoard = new PIXI.Text('', fontStyle);
+            timerBoard = new Container();
             timerBoard.x = 20;
             timerBoard.y = 0;
             gameScene.addChild(timerBoard);
+            // 倒數計時板
+            downCountBoard = new Container();
+            downCountBoard.x = 300;
+            downCountBoard.y = 300;
+            gameScene.addChild(downCountBoard);
             // 目前字母
             currentWordBoard = new Container();
+            currentWordBoard.visible = false;
             currentWordBoard.x = app.stage.width / 2 - 90;
             currentWordBoard.y = 20;
             gameScene.addChild(currentWordBoard);
@@ -246,6 +268,7 @@
                 PIXI.Texture.fromFrame("alien1/alien1-3.png")
             ];
             playerA = new PIXI.extras.AnimatedSprite(PlayerAfF);
+            playerA.alpha = 0;
             playerA.animationSpeed = 0.5;
             playerA.x = 200;
             playerA.y = footer ;
@@ -287,6 +310,7 @@
                 PIXI.Texture.fromFrame("alien2/alien2-3.png")
             ];
             playerB = new PIXI.extras.AnimatedSprite(PlayerBfF);
+            playerB.alpha = 0;
             playerB.animationSpeed = 0.5;
             playerB.x = app.stage.width - 200;
             playerB.y = footer;
@@ -321,8 +345,6 @@
             lightB.x = playerB.width / 2;
             lightB.y = playerB.height;
             lightB.alpha = 0;
-
-
 
             /*
             * 遊戲結束畫面
@@ -430,12 +452,25 @@
             state = play
             app.ticker.add(delta => gameLoop(delta));
             WebSocketTest();
-            start();
         }
 
         // 遊戲預備
         function ready() {
-            
+            console.log('ready');
+            document.querySelector(".qrcode").style.display = "none";
+            let downcount = 5;
+            readyInterval = setInterval(function(){
+                downcount --;
+                if (downcount<=0) {
+                    downCountBoard.visible = false;
+                    currentWordBoard.visible = true;
+                    num2Pic(timerBoard, timer);
+                    gameScene.visible = true;
+                    start();
+                    clearInterval(readyInterval);
+                }
+                num2Pic(downCountBoard, downcount);
+            }, 1000);
         }
 
         // 遊戲循環
@@ -447,8 +482,8 @@
 
             timerInterval = setInterval(function(){
                 timer--;
-                if (timer<=0) state = end;
-                timerBoard.setText(timer);
+                if (timer<=0) state = gameover;
+                num2Pic(timerBoard, timer);
             }, 1000);
             
             letterDropInterval = setInterval(function(){
@@ -675,9 +710,16 @@
         }
 
         // 遊戲結束
-        function end() {
-            gameScene.visible = false;
-            gameSceneOver.visible = true;
+        function gameover() {
+            if (playerA.doneList.length > playerB.doneList.length) {
+                // A 獲勝
+            } else if (playerA.doneList.length < playerB.doneList.length) {
+                // B 獲勝
+            } else {
+                // 平手
+            }
+            bg.alpha = 0.4;
+            // gameSceneOver.visible = true;
         }
 
         /* Helper functions */
@@ -765,6 +807,30 @@
             return hit;
         };
 
+        // 數字轉換圖片
+        function num2Pic(container, num) {
+            container.removeChildren(0, 3);
+            num.toString().split('').forEach(function(num, idx) {
+                let _num = new Sprite(id[`Number/${num}.png`]);
+                _num.x = idx * 50;
+                _num.y = 0;
+                container.addChild(_num);
+
+                /*
+                TweenMax.to(_num, 0.7,{
+                    scale: {y: 1.5},
+                    transformOrigin: "50% 100%",
+                    yoyo: false, repeat: -1
+                });
+
+                */
+                TweenMax.to(_num.scale, 0.7,{
+                    x: 1, y: 1.5,
+                    yoyo: false, repeat: -1
+                });
+
+            });
+        }
 
         //The `randomInt` helper function
         function randomInt(min, max) {
