@@ -132,11 +132,7 @@
             state, letters, wordList, correctLetter, randLetters, dropLetter,
             gameSceneBegin, gameScene, gameSceneOver, welcomeContainer, id,
             timerInterval, letterDropInterval, Starbg1,
-<<<<<<< HEAD
             timer = 500, bg,
-=======
-            timer = 3, bg,
->>>>>>> 9900c6dbb4ad66d9aa14dfc03d90ca7baaa6644f
             lightA, lightA_1, lightA_2, lightA_3, isPositionIdx = 1,
             lightB, lightB_1, lightB_2, lightB_3,
             playerDel,logo, winlogo, playerDelEf, deuce;
@@ -218,13 +214,9 @@
                 PIXI.Texture.fromFrame("button-start/start-2.png"),
             ];
             buttonPlay = new PIXI.extras.AnimatedSprite(PlayButtonFF);
-<<<<<<< HEAD
-            buttonPlay.x = app.stage.width / 2 - 150;
-=======
 
             
             buttonPlay.x = app.stage.width / 2 - buttonPlay.width /2;
->>>>>>> 9900c6dbb4ad66d9aa14dfc03d90ca7baaa6644f
             buttonPlay.y = 550;
 
             buttonPlay.interactive = true;
@@ -244,19 +236,12 @@
 
 
             // logo
-<<<<<<< HEAD
-            let logo = new Sprite(id[`logo.png`]);
-            logo.x = app.stage.width / 2 - 300;
-            logo.y = 270;
-            welcomeContainer.addChild(logo);
-=======
             logo = new Sprite(id[`logo.png`]);
             logo.x = app.stage.width / 2 - logo.width /2;
             logo.y = 270;
             welcomeContainer.addChild(logo);
 
 
->>>>>>> 9900c6dbb4ad66d9aa14dfc03d90ca7baaa6644f
             gameSceneBegin.addChild(welcomeContainer);
 
             /*
@@ -281,11 +266,6 @@
             currentWordBoard.x = app.stage.width / 2 - 90;
             currentWordBoard.y = 20;
             gameScene.addChild(currentWordBoard);
-<<<<<<< HEAD
-            //
-=======
-            
->>>>>>> 9900c6dbb4ad66d9aa14dfc03d90ca7baaa6644f
 
             // win logo
             winlogo = new Sprite(id[`ui/win.png`]);
