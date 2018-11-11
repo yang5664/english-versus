@@ -3,14 +3,15 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/websocket"
 )
 
 var clients = make(map[*websocket.Conn]bool) // connected clients
 var broadcast = make(chan Message)           // broadcast channel
-var players [2]Player						 // connected players
-var playground = new(Playground)		 	 // one Playground
+var players []*Player						 // connected players
+var playgrounds []*Playground				 // one Playground
 var counter int								 // connected counter
 // Configure the upgrader
 var upgrader = websocket.Upgrader{
@@ -21,19 +22,22 @@ var upgrader = websocket.Upgrader{
 
 // Define our message object
 type Message struct {
-	Type    string `json:"type"`
-	Channel string `json:"channel"`
-	Message  string `json:"message"`
+	Type         string `json:"type"`
+	PlaygroundId string `json:"playground_id"`
+	Message      string `json:"message"`
 }
 
 type Player struct {
 	conn    *websocket.Conn
-	name	string
+	id 		int
+	playgroundId string
+	no		int			// 1p 2p
 }
 
 type Playground struct {
 	conn    *websocket.Conn
 	id 		int
+	playerNum int		// Number of players
 }
 
 func main() {
@@ -69,16 +73,34 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 
 	counter++
 
-	if counter == 1 {
-		playground.conn = ws
-		playground.id = counter
-	}
-
 	for {
 		var msg Message
 
 		// Read in a new message as JSON and map it to a Message object
 		err := ws.ReadJSON(&msg)
+
+		if msg.Type == "login" {
+			var player  = new(Player)
+			player.conn = ws
+			player.id = counter
+			player.playgroundId = msg.PlaygroundId
+			players = append(players, player)
+
+		} else if msg.Type == "playground" {
+			var playground = new(Playground)
+			playground.conn = ws
+			playground.id = counter
+			playground.playerNum = 0;
+			playgrounds = append(playgrounds, playground)
+
+			// send login success
+			var message = new (Message)
+			message.Type = "playground"
+			message.PlaygroundId = strconv.Itoa(playground.id)
+			message.Message = ""
+			ws.WriteJSON(message)
+		}
+
 		if err != nil {
 			log.Printf("error: %v", err)
 			delete(clients, ws)
@@ -95,18 +117,24 @@ func handleMessages() {
 		msg := <-broadcast
 
 		if msg.Type == "action" {
-			playground.conn.WriteJSON(msg)
-		} else {
-			// Send it out to every client that is currently connected
-			for client := range clients {
-				err := client.WriteJSON(msg)
-				if err != nil {
-					log.Printf("error: %v", err)
-					client.Close()
-					delete(clients, client)
+			for _, playground := range playgrounds {
+				if strconv.Itoa(playground.id) == msg.PlaygroundId {
+					playground.conn.WriteJSON(msg)
 				}
 			}
 		}
+
+		//else {
+		//	// Send it out to every client that is currently connected
+		//	for client := range clients {
+		//		err := client.WriteJSON(msg)
+		//		if err != nil {
+		//			log.Printf("error: %v", err)
+		//			client.Close()
+		//			delete(clients, client)
+		//		}
+		//	}
+		//}
 
 
 	}

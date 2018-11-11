@@ -16,6 +16,7 @@
 
                 ws.onopen = function() {
                     console.log("Connection is connected...");
+                    setPlayground();
                 };
 
                 ws.onmessage = function (evt) {
@@ -23,6 +24,10 @@
                     console.log(received_msg);
                     var obj = JSON.parse(received_msg);
                     showLog(obj.message);
+
+                    if(obj.type == 'playground') {
+                        showPlayersQRCode(obj.playground_id);
+                    }
                 };
 
                 ws.onclose = function() {
@@ -42,9 +47,21 @@
             function setPlayground() {
                 ws.send(JSON.stringify({
                     type: "playground",
-                    channel: "1",
+                    playground_id: "",
                     message: ""
                 }));
+            }
+
+            function showPlayersQRCode(val) {
+                // 顯示player登入的QRCode
+                // src="https://chart.googleapis.com/chart?chs=150x150&cht=qr&chl=Hello%20world&choe=UTF-8"
+                var p1 = document.getElementById("p1");
+                var url1 = encodeURIComponent("http://www.5floor.net/english-versus/index.html?player=1&playground_id=" + val);
+                p1.innerHTML = "<img src='https://chart.googleapis.com/chart?chs=200x200&amp;cht=qr&amp;chl="+url1+"&amp;choe=UTF-8' alt='QR code'>";
+
+                var p2 = document.getElementById("p2");
+                var url1 = encodeURIComponent("http://www.5floor.net/english-versus/index.html?player=2&playground_id=" + val);
+                p2.innerHTML = "<img src='https://chart.googleapis.com/chart?chs=200x200&amp;cht=qr&amp;chl="+url1+"&amp;choe=UTF-8' alt='QR code'>";
             }
         }
     </script>
@@ -54,10 +71,10 @@
 <body>
 <div id = "sse">
     Playground <br/>
-    <button type="button" style="height:50px;width:100px" onClick="javascript:WebSocketTest();">connect</button>
-    <button type="button" style="height:50px;width:100px" onClick="javascript:setPlayground();">setPlayground</button>
-    <button type="button" style="height:50px;width:100px" onClick="javascript:ws.close();">disconnect</button>
-
+    <button type="button" onClick="javascript:WebSocketTest();">connect</button>
+    <button type="button" onClick="javascript:ws.close();">disconnect</button>
+    <div id="p1"></div>
+    <div id="p2"></div>
 </div>
 <div id= "log">
 
