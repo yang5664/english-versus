@@ -132,7 +132,7 @@
             state, letters, wordList, correctLetter, randLetters, dropLetter,
             gameSceneBegin, gameScene, gameSceneOver, welcomeContainer, id,
             timerInterval, letterDropInterval, Starbg1,
-            timer = 500, bg,
+            timer = 10, bg,
             lightA, lightA_1, lightA_2, lightA_3, isPositionIdx = 1,
             lightB, lightB_1, lightB_2, lightB_3,
             playerDel,logo, winlogo, playerDelEf, deuce;
@@ -398,6 +398,7 @@
             * 初始化 A-Z 字母
             */
             wordList = [
+                /*
                 'CAT',
                 'DOG',
                 'BUG',
@@ -409,6 +410,8 @@
                 'FOX',
                 'COW',
                 'ZOO'
+                */
+                'AAA'
             ];
             /*
             * 建立遊戲需要的字母
@@ -722,6 +725,7 @@
                     console.log(player.doneList);
                     setTimeout(() => {
                         player.collect = [];
+                        player.board.removeChildren(0, 3);
                         genLetters();
                     }, 500);
                 }
@@ -743,10 +747,10 @@
             player.collect.forEach(function(letter, idx) {
                 let _letter = new Sprite(id[`font/${letter}.png`]);
                 if (player.id == 'A') {
-                    _letter.x = (idx * 50) - 145;
+                    _letter.x = (idx * 65) - 135;
                     _letter.y = 15;
                 } else {
-                    _letter.x = idx * 60 - 4;
+                    _letter.x = idx * 65 - 3;
                     _letter.y = 15;
                 }
                 _letter.scale.x = 0.7;
@@ -785,7 +789,12 @@
 
         // 遊戲結束
         function gameover() {
-
+            clearInterval(timerInterval);
+            clearInterval(letterDropInterval);
+            timerBoard.visible = false;
+            currentWordBoard.visible = false;
+            playerA.board.visible = false;
+            playerB.board.visible = false;
             if (playerA.doneList.length > playerB.doneList.length) {
                 // A 獲勝
                 playerDelLost(playerB);
