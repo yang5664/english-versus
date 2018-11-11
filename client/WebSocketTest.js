@@ -32,10 +32,11 @@ function WebSocketTest() {
                 if (playerA.alpha && playerB.alpha) {
                     ready();
                 }
-
-                playerA.alpha = 1;
-                playerB.alpha = 1;
-                ready();
+                /*
+                   playerA.alpha = 1;
+                   playerB.alpha = 1;
+                   ready();
+                */
             }
             
             if (obj.type == 'action'){

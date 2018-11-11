@@ -132,7 +132,7 @@
             state, letters, wordList, correctLetter, randLetters, dropLetter,
             gameSceneBegin, gameScene, gameSceneOver, welcomeContainer, id,
             timerInterval, letterDropInterval, Starbg1,
-            timer = 10, bg,
+            timer = 60, bg,
             lightA, lightA_1, lightA_2, lightA_3, isPositionIdx = 1,
             lightB, lightB_1, lightB_2, lightB_3,
             playerDel,logo, winlogo, playerDelEf, deuce;
@@ -215,9 +215,8 @@
             ];
             buttonPlay = new PIXI.extras.AnimatedSprite(PlayButtonFF);
 
-            
             buttonPlay.x = app.stage.width / 2 - buttonPlay.width /2;
-            buttonPlay.y = 550;
+            buttonPlay.y = 450;
 
             buttonPlay.interactive = true;
             buttonPlay.buttonMode = true;
@@ -238,7 +237,7 @@
             // logo
             logo = new Sprite(id[`logo.png`]);
             logo.x = app.stage.width / 2 - logo.width /2;
-            logo.y = 270;
+            logo.y = 220;
             welcomeContainer.addChild(logo);
 
 
@@ -283,7 +282,7 @@
                 PIXI.Texture.fromFrame("explosionFail/explosionFail-8.png"),
             ];
             playerDel = new PIXI.extras.AnimatedSprite(playerDelEf);
-            playerDel.animationSpeed = 0.3;
+            playerDel.animationSpeed = 0.2;
             playerDel.loop = false;
 
             // 玩家A
@@ -311,6 +310,7 @@
             gameScene.addChild(playerA.board);
             // 底板
             let wordHolderBoardA = new Sprite(id[`ui/blue_ui.png`]);
+            wordHolderBoardA.alpha = 0;
             wordHolderBoardA.scale.x = 1.8;
             wordHolderBoardA.scale.y = 1.5;
             wordHolderBoardA.x = 0;
@@ -362,6 +362,7 @@
             gameScene.addChild(playerB.board);
             // 底板
             let wordHolderBoardB = new Sprite(id[`ui/red_ui.png`]);
+            wordHolderBoardB.alpha = 0;
             wordHolderBoardB.scale.x = 1.8;
             wordHolderBoardB.scale.y = 1.5;
             wordHolderBoardB.x = app.stage.width - wordHolderBoardB.width;
@@ -398,7 +399,6 @@
             * 初始化 A-Z 字母
             */
             wordList = [
-                /*
                 'CAT',
                 'DOG',
                 'BUG',
@@ -410,8 +410,6 @@
                 'FOX',
                 'COW',
                 'ZOO'
-                */
-                'AAA'
             ];
             /*
             * 建立遊戲需要的字母
@@ -512,6 +510,7 @@
         }
         //輸的玩家
         function playerDelLost(player) {
+            createjs.Sound.play("boom");
             playerDel.x = player.x;
             playerDel.y = player.y;
             playerDel.play();
@@ -524,7 +523,6 @@
         }
         // 遊戲預備
         function ready() {
-            console.log('ready');
             document.querySelector(".qrcode").style.display = "none";
             let downcount = 5;
             readyInterval = setInterval(function(){
@@ -532,6 +530,8 @@
                 if (downcount<=0) {
                     downCountBoard.visible = false;
                     currentWordBoard.visible = true;
+                    playerA.wordHolderBoard.alpha = 1;
+                    playerB.wordHolderBoard.alpha = 1;
                     num2Pic(timerBoard, timer);
                     gameScene.visible = true;
                     start();
@@ -722,7 +722,6 @@
                 });
                 if (player.collect.length > 0) {
                     player.doneList.push(player.collect.join(''));
-                    console.log(player.doneList);
                     setTimeout(() => {
                         player.collect = [];
                         player.board.removeChildren(0, 3);
@@ -786,15 +785,19 @@
             randLetters = [...randLetters, ...correctLetter];
             // 
         }
-
+        
+        let isOver = true;
         // 遊戲結束
         function gameover() {
+            if(!isOver) return ;
+            isOver = false;
             clearInterval(timerInterval);
             clearInterval(letterDropInterval);
             timerBoard.visible = false;
             currentWordBoard.visible = false;
             playerA.board.visible = false;
             playerB.board.visible = false;
+
             if (playerA.doneList.length > playerB.doneList.length) {
                 // A 獲勝
                 playerDelLost(playerB);
