@@ -17,7 +17,7 @@ function WebSocketTest() {
         ws.onmessage = function (evt) {
             var received_msg = evt.data;
             var obj = JSON.parse(received_msg);
-            console.log(obj);
+            // console.log(obj);
 
             if(obj.type == 'playground') {
                 showPlayersQRCode(obj.playground_id);

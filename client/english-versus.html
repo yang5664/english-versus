@@ -43,7 +43,6 @@
         letter-spacing: 10px;
     }
     .qrcode{
-        display: noen;
         position: fixed;
         width: 100%;
         height: 100%;
@@ -133,9 +132,10 @@
             state, letters, wordList, correctLetter, randLetters, dropLetter,
             gameSceneBegin, gameScene, gameSceneOver, welcomeContainer, id,
             timerInterval, letterDropInterval, Starbg1,
-            timer = 5, bg,
+            timer = 3, bg,
             lightA, lightA_1, lightA_2, lightA_3, isPositionIdx = 1,
-            lightB, lightB_1, lightB_2, lightB_3
+            lightB, lightB_1, lightB_2, lightB_3,
+            playerDel,logo, winlogo, playerDelEf, deuce;
 
         let fontStyle = new PIXI.TextStyle({
                 fontFamily: 'Arial',
@@ -205,6 +205,7 @@
                     Starbg1.gotoAndPlay(0);
                 }, 1300);
             };
+
             // 歡迎畫面
             welcomeContainer = new Container();
             //var buttonPlay = new PIXI.Text("Let's Play", fontStyle);
@@ -213,8 +214,11 @@
                 PIXI.Texture.fromFrame("button-start/start-2.png"),
             ];
             buttonPlay = new PIXI.extras.AnimatedSprite(PlayButtonFF);
-            buttonPlay.x = 640;
+
+            
+            buttonPlay.x = app.stage.width / 2 - buttonPlay.width /2;
             buttonPlay.y = 550;
+
             buttonPlay.interactive = true;
             buttonPlay.buttonMode = true;
             buttonPlay.on('mouseover', function(e){
@@ -229,11 +233,14 @@
                 welcomeContainer.visible = false;
             });
             welcomeContainer.addChild(buttonPlay)
+
+
             // logo
-            let logo = new Sprite(id[`logo.png`]);
-            logo.x = 500;
+            logo = new Sprite(id[`logo.png`]);
+            logo.x = app.stage.width / 2 - logo.width /2;
             logo.y = 270;
             welcomeContainer.addChild(logo);
+
 
             gameSceneBegin.addChild(welcomeContainer);
 
@@ -259,7 +266,26 @@
             currentWordBoard.x = app.stage.width / 2 - 90;
             currentWordBoard.y = 20;
             gameScene.addChild(currentWordBoard);
+            
 
+            // win logo
+            winlogo = new Sprite(id[`ui/win.png`]);
+            deuce = new Sprite(id[`ui/deuce.png`]);
+
+             // 玩家爆炸
+             playerDelEf = [
+                PIXI.Texture.fromFrame("explosionFail/explosionFail-1.png"),
+                PIXI.Texture.fromFrame("explosionFail/explosionFail-2.png"),
+                PIXI.Texture.fromFrame("explosionFail/explosionFail-3.png"),
+                PIXI.Texture.fromFrame("explosionFail/explosionFail-4.png"),
+                PIXI.Texture.fromFrame("explosionFail/explosionFail-5.png"),
+                PIXI.Texture.fromFrame("explosionFail/explosionFail-6.png"),
+                PIXI.Texture.fromFrame("explosionFail/explosionFail-7.png"),
+                PIXI.Texture.fromFrame("explosionFail/explosionFail-8.png"),
+            ];
+            playerDel = new PIXI.extras.AnimatedSprite(playerDelEf);
+            playerDel.animationSpeed = 0.3;
+            playerDel.loop = false;
 
             // 玩家A
             let PlayerAfF = [
@@ -312,7 +338,7 @@
             playerB = new PIXI.extras.AnimatedSprite(PlayerBfF);
             playerB.alpha = 0;
             playerB.animationSpeed = 0.5;
-            playerB.x = app.stage.width - 200;
+            playerB.x = app.stage.width - playerB.width - 200;
             playerB.y = footer;
             playerB.vx = 0;
             playerB.vy = 0;
@@ -453,7 +479,31 @@
             app.ticker.add(delta => gameLoop(delta));
             WebSocketTest();
         }
+        //設定deuce字
+        function setDeuce() {
+            deuce.x = app.stage.width / 2 - deuce.width /2;
+            deuce.y = 300;
+            gameScene.addChild(deuce);
+        }
 
+        //設定win字
+        function setWin(win_player) {
+            winlogo.x = win_player.x - 25;
+            winlogo.y = win_player.y - (winlogo.height + 38);
+            gameScene.addChild(winlogo);
+        }
+        //輸的玩家
+        function playerDelLost(player) {
+            playerDel.x = player.x;
+            playerDel.y = player.y;
+            playerDel.play();
+            player.visible = false;
+            gameScene.addChild(playerDel);
+            playerDel.onComplete = ()=>{
+                playerDel.visible = false;
+                gameScene.removeChild(playerDel);
+            };
+        }
         // 遊戲預備
         function ready() {
             console.log('ready');
@@ -654,9 +704,11 @@
                 });
                 if (player.collect.length > 0) {
                     player.doneList.push(player.collect.join(''));
-                    player.collect = [];
                     console.log(player.doneList);
-                    genLetters();
+                    setTimeout(() => {
+                        player.collect = [];
+                        genLetters();
+                    }, 500);
                 }
             }
             //
@@ -711,15 +763,20 @@
 
         // 遊戲結束
         function gameover() {
+
             if (playerA.doneList.length > playerB.doneList.length) {
                 // A 獲勝
+                playerDelLost(playerB);
+                setWin(playerA);
             } else if (playerA.doneList.length < playerB.doneList.length) {
                 // B 獲勝
+                playerDelLost(playerA);
+                setWin(playerB);
             } else {
                 // 平手
+                setDeuce();
             }
             bg.alpha = 0.4;
-            // gameSceneOver.visible = true;
         }
 
         /* Helper functions */
