@@ -52,7 +52,7 @@ func main() {
 	go handleMessages()
 
 	// Start the server on localhost port 8000 and log any errors
-	log.Println("http server started on :8000")
+	log.Println("http server started on :8000 ver 0.1")
 	err := http.ListenAndServe(":8000", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
@@ -85,6 +85,24 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			player.id = counter
 			player.playgroundId = msg.PlaygroundId
 			players = append(players, player)
+
+			// notify player playground
+			for _, playground := range playgrounds {
+				if strconv.Itoa(playground.id) == msg.PlaygroundId {
+					playground.playerNum ++
+					if playground.playerNum <= 2 {
+						player.no = playground.playerNum
+						var message= new(Message)
+						message.Type = "join"
+						message.PlaygroundId = msg.PlaygroundId
+						message.Message = strconv.Itoa(playground.playerNum)
+						playground.conn.WriteJSON(message)
+						player.conn.WriteJSON(message)
+					} else {
+						// error
+					}
+				}
+			}
 
 		} else if msg.Type == "playground" {
 			var playground = new(Playground)
