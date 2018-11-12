@@ -1,13 +1,6 @@
-# Go Chat
+#Game Server
 
-This is a simple chat web app written in Go
+Modufid from https://github.com/scotch-io/go-realtime-chat
 
-Just run the following
+Use for communicat Playground and Controller, and game rooms management.
 
-```
-cd ./src
-go get github.com/gorilla/websocket
-go run main.go
-```
-
-Then point your browser to http://localhost:8000
